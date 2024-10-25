@@ -1,0 +1,30 @@
+public class AiChatService
+{
+    string _systemMessage;
+    ChatCompletionsClient _client;
+    
+    public void Initiliaze(string systemMessage)
+    {
+        _client = new ChatCompletionsClient(
+        new Uri(Environment.GetEnvironmentVariable("AZURE_INFERENCE_ENDPOINT")),
+        new AzureKeyCredential(Environment.GetEnvironmentVariable("AZURE_INFERENCE_CREDENTIAL"))
+        _systemMessage = systemMessage;
+    }
+
+
+
+    public string Chat(string message)
+    {
+        requestOptions = new ChatCompletionsOptions()
+        {
+            Messages = {
+                new ChatRequestSystemMessage(_systemMessage),
+                new ChatRequestUserMessage(message)
+            },
+            AdditionalProperties = { { "logprobs", BinaryData.FromString("true") } },
+        };
+
+        var response = _client.Complete(requestOptions, extraParams: ExtraParameters.PassThrough);
+        return response.Value.Choices[0].Message.Content;
+    }
+}

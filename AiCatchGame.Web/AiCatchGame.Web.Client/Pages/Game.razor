@@ -1,0 +1,98 @@
+@using AiCatchGame.Bo
+@using AiCatchGame.Web.Client.Components
+@page "/game"
+
+@if (GameData == null)
+{
+    <MudText>Loading...</MudText>
+}
+else if (GameData.Status == GameStatuses.InLobby)
+{
+    <MudText>En attente des autres joueurs...</MudText>
+}
+else if (GameData.Status == GameStatuses.Over)
+{
+
+    <MudText>Partie finie. Merci d'avoir joué</MudText>
+    <ScoreCard Game="@GameData" />
+    <MudButton href="/home">Nouvelle partie</MudButton>
+}
+else @* if (Game.Status == GameStatus.Playing) *@
+{
+
+    if (CurrentSet != null && _currentCharacter != null)
+    {
+        <h2> Tour n°@CurrentSet.RoundNumber</h2>
+        @if (CurrentSet.Status == GameSetStatuses.CharacterAttribution && TimerRemaining > 0)
+        {
+            <MudText Typo="Typo.h3">Votre nom pour ce tour est @_currentCharacter.Name</MudText>
+            <MudText>Le tour commence dans</MudText>
+            <GameTimer @bind-Value="TimerRemaining" />
+        }
+        @if (CurrentSet.Status == GameSetStatuses.Chatting && TimerRemaining > 0)
+        {
+            <GameTimer @bind-Value="TimerRemaining" />
+
+            <ul id="messagesList">
+                @foreach (string message in _messages)
+                {
+                    <li>@message</li>
+                }
+            </ul>
+
+            <div class="form-group">
+                <label>
+                    Message:
+                    <MudTextField Label="message" @bind-Value="_message" size="50" />
+                </label>
+            </div>
+            <MudButton OnClick="SendMessage">Send</MudButton>
+
+        }
+        else if (CurrentSet.Status == GameSetStatuses.Voting && TimerRemaining > 0 && _otherCharacters != null)
+        {
+            <MudText Typo="Typo.h3">Qui est l'IA ?</MudText>
+            foreach (CharacterInfo character in _otherCharacters)
+            {
+                <MudButton OnClick="@(async () => await VoteFor(character.Id))">@character.Name</MudButton>
+            }
+        }
+        else if (CurrentSet.Status == GameSetStatuses.End && _setResult != null && _playerResultInfo != null)
+        {
+
+
+            <MudText>L'IA était <span class="suspenseOpen">@_setResult.AiInfo.Character.Name</span></MudText>
+            @foreach (PlayerGameSetResultInfo player in _setResult.Players)
+            {
+                <MudText>
+                    <span class="emph">@player.Name</span> qui jouait <span class="emph">@GetCharacterNameById(player.CharacterId)</span>
+                    a voté en <span class="emph">@player.VoteReaction.ToString("s.ff")s</span> pour <span class="@(player.HasFoundAi ? "success" : "failure") emph"> @GetCharacterNameById(player.CharacterId)</span>
+                    <span class="point emph @(player.ScoreVote > 0 ? "success" : "failure")">@player.ScoreVote</span>
+                </MudText>
+                <MudText>
+                    <span class="emph @(player.ScoreVote > 0 ? "success" : "failure")">
+                        @GetPlayersStringById(player.PlayerIdsVotedFor)
+
+                    </span>
+                    @if (player.PlayerIdsVotedFor.Length == 0)
+                    {
+                        <span>n'a</span>
+                    }
+                    else if (player.PlayerIdsVotedFor.Length == 1)
+                    {
+                        <span>a</span>
+                    }
+                    else
+                    {
+                        <span>ont</span>
+                    }
+                    <span> voté pour </span><span class="emph">@_currentCharacter.Name</span>
+                    <span class="point emph @(player.ScoreVotedAsAi > 0 ? "success" : "failure")">@player.ScoreVotedAsAi</span>
+                </MudText>
+                <MudText>Ce qui fait <span class="point emph @(player.ScoreSet > 0 ? "success" : "neg")">@player.ScoreSet</span> points pour ce tour</MudText>
+                <MudText>Soit un total de <span class="point emph @(player.ScoreTotal > 0 ? "success" : "failure")">@player.ScoreTotal</span> points.</MudText>
+                <MudText><span class="result emph @(player.Status != PlayerStatuses.Lost ? "success" : "failure")">@player.Name est @(player.Status != PlayerStatuses.Lost ? "qualifié(e)" : "élmiminé(e)")</span></MudText>
+            }
+        }
+    }
+}
