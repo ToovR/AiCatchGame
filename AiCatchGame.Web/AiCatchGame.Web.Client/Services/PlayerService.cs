@@ -10,15 +10,14 @@ namespace AiCatchGame.Web.Client.Services
 {
     public class PlayerService : IPlayerService
     {
-        private readonly IAccessTokenProvider _accessTokenProvider;
         private readonly NavigationManager _navigation;
         private readonly INetClient _netClient;
         private HubConnection? _gameHubConnection = null;
         private ILocalStorageService _localStorage;
 
-        public PlayerService(IAccessTokenProvider accessTokenProvider, ILocalStorageService localStorage, INetClient netClient, NavigationManager navigation)
+        public PlayerService(NavigationManager Navigation, ILocalStorageService localStorage, INetClient netClient, NavigationManager navigation)
         {
-            _accessTokenProvider = accessTokenProvider;
+            _gameHubConnection = new HubConnectionBuilder().WithUrl(Navigation.ToAbsoluteUri("/gameHub")).Build();
             _navigation = navigation;
             _netClient = netClient;
             _localStorage = localStorage;
@@ -28,11 +27,16 @@ namespace AiCatchGame.Web.Client.Services
         {
             try
             {
+                _gameHubConnection.On<string, Guid>("GameJoined", async (privateId, publicId) =>
+                {
+                    PlayerKeyInfo? playerId = new PlayerKeyInfo(privateId, publicId);
+                    ArgumentNullException.ThrowIfNull(playerId);
+                    await _localStorage.SetItemAsync("PlayerPrivateId", playerId.PrivateId);
+                    await _localStorage.SetItemAsync("PlayerPublicId", playerId.PublicId);
+                });
+                
+                await _gameHubConnection.StartAsync();
                 await _gameHubConnection.SendAsync("JoinGame", pseudonym);
-                PlayerKeyInfo? playerId = await _netClient.PostAsync<string, PlayerKeyInfo>("/api/player", pseudonym);
-                ArgumentNullException.ThrowIfNull(playerId);
-                await _localStorage.SetItemAsync("PlayerPrivateId", playerId.PrivateId);
-                await _localStorage.SetItemAsync("PlayerPublicId", playerId.PublicId);
                 return ErrorCodes.None;
             }
             catch (AiCatchException ai)
@@ -43,7 +47,7 @@ namespace AiCatchGame.Web.Client.Services
                 }
                 return ErrorCodes.Undefined;
             }
-            catch
+            catch (Exception ex)
             {
                 return ErrorCodes.Undefined;
             }
@@ -164,7 +168,7 @@ namespace AiCatchGame.Web.Client.Services
         {
             try
             {
-                return await _localStorage.GetItemAsync<Guid>("PlayerPrivateId");
+                return await _localStorage.GetItemAsync<Guid?>("PlayerPrivateId");
             }
             catch
             {
@@ -176,7 +180,7 @@ namespace AiCatchGame.Web.Client.Services
         {
             try
             {
-                return await _localStorage.GetItemAsync<Guid>("PlayerPublicId");
+                return await _localStorage.GetItemAsync<Guid?>("PlayerPublicId");
             }
             catch
             {
@@ -187,16 +191,9 @@ namespace AiCatchGame.Web.Client.Services
         private HubConnection InitializeGameHubConnection()
         {
             HubConnection gameHubConnection = new HubConnectionBuilder()
-                  .WithUrl(_navigation.ToAbsoluteUri("/api/gamehub"), options =>
-                   {
-                       options.AccessTokenProvider = async () =>
-                       {
-                           var accessTokenResult = await _accessTokenProvider.RequestAccessToken();
-                           accessTokenResult.TryGetToken(out var accessToken);
-                           return accessToken.Value;
-                       };
-                   })
-        .Build();
+    .WithUrl(new Uri("/api/gamehub"))
+    .WithAutomaticReconnect()
+    .Build();
             return gameHubConnection;
         }
     }

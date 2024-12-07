@@ -4,18 +4,14 @@ using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MudBlazor.Services;
 
+using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
-builder.Services.AddAuthorizationCore();
-builder.Services.AddCascadingAuthenticationState();
-builder.Services.AddAuthenticationStateDeserialization();
-
-// https://github.com/Blazored/LocalStorage
-builder.Services.AddBlazoredLocalStorage();
-
 builder.Services.AddHttpClient();
+builder.Services.AddMudServices();
 builder.Services.AddScoped<INetClient, NetClient>();
 builder.Services.AddScoped<IPlayerService, PlayerService>();
-builder.Services.AddMudServices();
+builder.Services.AddBlazoredLocalStorage();
 
 await builder.Build().RunAsync();

@@ -6,7 +6,5 @@ using System.Threading.Tasks;
 
 namespace AiCatchGame.Bo
 {
-    public class AiPlayer : Player
-    {
-    }
+    public record PlayerSetInfo(Guid PlayerId, string characterName);
 }

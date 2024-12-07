@@ -6,9 +6,6 @@ using System.Threading.Tasks;
 
 namespace AiCatchGame.Bo
 {
-    public class PlayerKeyInfo
-    {
-        public Guid PrivateId { get; set; }
-        public Guid PublicId { get; set; }
-    }
+    public record PlayerKeyInfo(string PrivateId, Guid PublicId );
+
 }

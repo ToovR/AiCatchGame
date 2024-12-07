@@ -15,9 +15,9 @@ namespace AiCatchGame.Web
 
         public async Task JoinGame(string pseudonym)
         {
-            string userId = Context.User.Identity.Name;
-            Guid publicId = await _gameService.AddPlayerToGame(pseudonym, userId);
-            await Clients.Caller.SendAsync("GameJoined", userId, publicId);
+            string privateId = Context.User.Identity.Name;
+            Guid publicId = await _gameService.AddPlayerToGame(pseudonym, privateId);
+            await Clients.Caller.SendAsync("GameJoined", privateId, publicId);
         }
 
         public async Task OnReceivedMessage(Action<Guid, string> receivedMessageAction)
@@ -36,14 +36,14 @@ namespace AiCatchGame.Web
         {
         }
 
-        public async Task OnSetStartChat(Action<GameSetChatingInfo> setStartChatAction)
+        public async Task OnSetStartChat(Action<GameSetChattingInfo> setStartChatAction)
         {
-            _gameHubConnection.On<GameSetChatingInfo>("SetStartChat", (GameSetChatingInfo gameSetChatingInfo) => setStartChatAction(gameSetChatingInfo));
+            await Clients.All.SendAsync("SetStartChat", (GameSetChattingInfo gameSetChatingInfo) => setStartChatAction(gameSetChatingInfo));
         }
 
         public async Task OnSetStartVote(Action<GameSetVotingInfo> setStartVoteAction)
         {
-            _gameHubConnection.On<GameSetVotingInfo>("SetStartVote", (GameSetVotingInfo gameSetVotingInfo) => setStartVoteAction(gameSetVotingInfo));
+            await Clients.All.SendAsync("SetStartVote", (GameSetVotingInfo gameSetVotingInfo) => setStartVoteAction(gameSetVotingInfo));
         }
 
         public async Task SendMessage(Guid playerId, string message)
@@ -51,12 +51,12 @@ namespace AiCatchGame.Web
             GameServer game = await _gameService.GetGameByPlayerId(playerId);
             Guid characterId = await _gameService.GetCharacterId(playerId);
 
-            await Clients.Users(game.HumanPlayers.Select(p => p.Id.ToString())).All.SendAsync("ReceiveMessage", characterId, message);
+            await Clients.Users(game.HumanPlayers.Select(p => p.Id.ToString())).SendAsync("ReceiveMessage", characterId, message);
         }
-
+        
         public async Task SendPlayerReady(Guid player)
         {
-            _gameService.
+            await Clients.All.SendAsync("SendPlayerReady", player);
         }
 
         public async Task StartGame(Guid gameId)
@@ -67,9 +67,6 @@ namespace AiCatchGame.Web
             await Clients.Users(game.PlayerIds).SendAsync("StartGame", gameClient);
         }
 
-        public async Task StartGame(GGame game)
-        {
-            await Clients.All.SendAsync("GameStart", game);
-        }
+        
     }
 }

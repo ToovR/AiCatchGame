@@ -56,7 +56,6 @@ namespace AiCatchGame.Web.HostedServices
             foreach (GameServer game in games)
             {
                 await _gameHubConnection.SendAsync("StartGame", game.Id);
-                gameService.
             }
         }
     }

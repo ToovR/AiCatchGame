@@ -2,15 +2,14 @@ namespace AiCatchGame.Bo
 {
     public class ChatMessage
     {
-        public ChatMessage(string content, double delay)
+        public ChatMessage(CharacterInfo character, string content)
         {
+            Character = character;
             Content = content;
-            Delay = delay;
         }
 
         public string Content { get; }
-        public double Delay { get; }
-        public Player? Player { get; set; }
+        public CharacterInfo Character { get; set; }
         public DateTime? Time { get; set; }
     }
 }

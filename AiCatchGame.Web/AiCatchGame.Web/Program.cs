@@ -1,45 +1,39 @@
 using AiCatchGame.Web.Components;
-using AiCatchGame.Web.Components.Account;
-using AiCatchGame.Web.Data;
+using AiCatchGame.Web.Api;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using AiCatchGame.Web;
+using MudBlazor.Services;
+using Blazored.LocalStorage;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
-    .AddInteractiveWebAssemblyComponents()
-    .AddAuthenticationStateSerialization();
+    .AddInteractiveWebAssemblyComponents();
 
-builder.Services.AddCascadingAuthenticationState();
-builder.Services.AddScoped<IdentityUserAccessor>();
-builder.Services.AddScoped<IdentityRedirectManager>();
 
-builder.Services.AddAuthentication(options =>
-    {
-        options.DefaultScheme = IdentityConstants.ApplicationScheme;
-        options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
-    })
-    .AddIdentityCookies();
-builder.Services.AddAuthorization();
+ // https://www.c-sharpcorner.com/article/building-a-real-time-chat-application-with-net-core-7-signalr/
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+builder.Services.AddSignalR();
+builder.Services.AddMudServices();
+builder.Services.AddControllersWithViews();
 
-builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
-    .AddEntityFrameworkStores<ApplicationDbContext>()
-    .AddSignInManager()
-    .AddDefaultTokenProviders();
 
-builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
+
 
 var app = builder.Build();
+
+app.MapControllerRoute(
+    name: "default",
+    pattern: "api/{Game}/{action=Index}/{id?}");
+app.MapHub<GameHub>("/gameHub");
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseWebAssemblyDebugging();
-    app.UseMigrationsEndPoint();
 }
 else
 {
@@ -50,6 +44,7 @@ else
 
 app.UseHttpsRedirection();
 
+
 app.UseAntiforgery();
 
 app.MapStaticAssets();
@@ -57,22 +52,6 @@ app.MapRazorComponents<App>()
     .AddInteractiveWebAssemblyRenderMode()
     .AddAdditionalAssemblies(typeof(AiCatchGame.Web.Client._Imports).Assembly);
 
-// Add additional endpoints required by the Identity /Account Razor components.
-app.MapAdditionalIdentityEndpoints();
-
 app.Run();
 
-app.MapGroup("/Player").MapPlayer();
 
-/*
- // https://www.c-sharpcorner.com/article/building-a-real-time-chat-application-with-net-core-7-signalr/
-
-builder.Services.AddSignalR();
-builder.Services.AddControllersWithViews();
-
-app.MapControllerRoute(
-    name: "default",
-    pattern: "api/{Game}/{action=Index}/{id?}");
-app.MapHub<GameHub>("/gameHub");
-
-*/

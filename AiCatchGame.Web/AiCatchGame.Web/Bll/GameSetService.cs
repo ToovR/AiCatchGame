@@ -1,8 +1,16 @@
+using AiCatchGame.Bo;
+using AiCatchGame.Web.Helpers;
+using AiCatchGame.Web.Interfaces;
+
 namespace AiCatchGame.Web.Bll
 {
-    public class GameSet
+    public class GameSetService
     {
-        private List<string> _poolNames = [ "Luke", "Leia", "Han", "Chewbacca", "Obi-Wan", "Anakin", "Padmé", "Yoda",
+        public GameSetService(IGameService game)
+        {
+            _game = game;
+        }
+        private List<string> _poolCharacterNames = [ "Luke", "Leia", "Han", "Chewbacca", "Obi-Wan", "Anakin", "Padmé", "Yoda",
             "Darth Vader", "R2-D2", "C-3PO", "Lando", "Boba Fett", "Jabba", "Wedge",
             "Mace Windu", "Qui-Gon Jinn", "Darth Maul", "Jar Jar Binks", "Count Dooku",
             "General Grievous", "Ahsoka Tano", "Rey", "Kylo Ren", "Finn", "Poe Dameron",
@@ -11,13 +19,17 @@ namespace AiCatchGame.Web.Bll
             "Bodhi Rook", "Galen Erso", "Mon Mothma", "Bail Organa", "Jango Fett",
             "Darth Sidious", "Darth Tyranus", "Darth Plagueis", "Darth Bane", "Darth Revan",
             "Darth Malak", "Darth Nihilus", "Darth Sion", "Darth Traya", "Darth Malgus"];
+        private readonly IGameService _game;
 
-        public List<GamSetPlayer> PlayerSetInfos { get; set; }
-
+        public GameSet GetGameSet(Guid id)
+        {
+            IEnumerable<GameServer> games = _game.GetGames();
+            return games.SelectMany(g => g.GameSets).Single(gs => gs.Id == id);
+        }
         public async Task EndChatPhase(Guid gameSetId)
         {
-            GameSet gameSet = getset(gameSetId);
-            gameSet.Status = SetPhase.Vote;
+            GameSet gameSet = GetGameSet(gameSetId);
+            gameSet.Status = GameSetStatuses.Voting;
             // TODO Notify vote
         }
 
@@ -30,24 +42,25 @@ namespace AiCatchGame.Web.Bll
             // TODO Notify vote
         }
 
-        public async Task InitializeSet(Game game)
+        public async Task InitializeSet(GameServer game)
         {
-            int roundNumber = (game.Sets.MaxOrDefault(s => s.RoundNumber) ?? 0) + 1;
-            GameSet newGameSet = new(rounNumber);
-            List<Player> remainingPlayers = game.HumanPlayers.Concat(game.Aiplayer).Cast<Players>().Where(p => p.GameStatus != GameStatuses.Lost).ToList();
+            int roundNumber = (game.GameSets.MaxOrDefault(s => s.RoundNumber) ?? 0) + 1;
+            GameSet newGameSet = new(roundNumber, Guid.NewGuid());
+            game.GameSets.Add(newGameSet);
+            List<Player> remainingPlayers = game.HumanPlayers.Cast<Player>().Concat(game.AiPlayers.Cast<Player>()).Where(p => p.Status != PlayerStatuses.Lost).ToList();
 
-            string[] poolNames = _poolNames.CloneArray();
+            List<string> remainingCharacterNames = ((string[])_poolCharacterNames.ToArray().Clone()).ToList();
             remainingPlayers.ForEach(p =>
             {
                 p.GameStatus = GameStatuses.Playing;
-                int index = Random.Next(poolNames.length)
+                int index = (new Random()).Next(remainingCharacterNames.Count);
 
-                string characterName = poolNames[index];
-                poolNames.RemoveAt(index);
-                p.Sets.Add(new PlayerSetInfo(newGameSet, characterName));
+                string characterName = remainingCharacterNames[index];
+                remainingCharacterNames.RemoveAt(index);
+                newGameSet.PlayerSetInfoList.Add(new PlayerSetInfo(p.Id, characterName));
             });
 
-            newGameSet.Status = SetStatuses.ChatPhase;
+            newGameSet.Status = GameSetStatuses.Chatting;
             // TODO Initialize Timer of chat
             // TODO Notify set start
         }

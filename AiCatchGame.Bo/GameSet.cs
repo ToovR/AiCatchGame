@@ -6,11 +6,13 @@ namespace AiCatchGame.Bo
         {
             RoundNumber = roundNumber;
             Id = id;
+            PlayerSetInfoList = [];
         }
 
         public Guid Id { get; }
         public int RoundNumber { get; }
 
         public GameSetStatuses Status { get; set; }
+        public List<PlayerSetInfo> PlayerSetInfoList { get; set; }
     }
 }

@@ -1,12 +1,13 @@
 using AiCatchGame.Bo;
 using AiCatchGame.Bo.Exceptions;
 using AiCatchGame.Web.Interfaces;
+using System.Globalization;
 
 namespace AiCatchGame.Web.Bll
 {
     public class GameService : IGameService
     {
-        public List<GameServer> _games = [];
+        private List<GameServer> _games = [];
 
         private const int LOBBY_PLAYER_WAIING_SECONDS = 5;
 
@@ -14,7 +15,7 @@ namespace AiCatchGame.Web.Bll
 
         private const int PLAYERS_MIN = 5;
 
-        public async Task<Guid> AddPlayerToGame(string pseudonym, string userId)
+        public async Task<Guid> AddPlayerToGame(string pseudonym, String privateId)
         {
             if (!_games.Any(g => g.Status == GameStatuses.InLobby))
             {
@@ -26,7 +27,7 @@ namespace AiCatchGame.Web.Bll
             {
                 throw new AiCatchException(ErrorCodes.AlreadyExists);
             }
-            HumanPlayer humanPlayer = new(userId, pseudonym);
+            HumanPlayer humanPlayer = new(privateId, pseudonym);
             game.HumanPlayers.Add(humanPlayer);
             game.LastAddedPlayerTime = DateTime.Now;
             return humanPlayer.PublicId;
@@ -64,6 +65,21 @@ namespace AiCatchGame.Web.Bll
             AiPlayer aiPlayer = new();
             newGame.AiPlayers = [aiPlayer];
             return newGame;
+        }
+
+        public Task<GameServer> GetGameByPlayerId(Guid playerId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Guid> GetCharacterId(Guid playerId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<GameServer> GetGames()
+        {
+            return _games;
         }
     }
 }

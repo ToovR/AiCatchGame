@@ -1,41 +1,46 @@
 ﻿@inherits LayoutComponentBase
 
 <MudLayout>
+    <script src="scripts/back_audio.js"></script>
 
-    <MudThemeProvider Theme="_customTheme" />
+    <MudThemeProvider Theme="_customTheme" IsDarkMode="true" />
     <MudDialogProvider />
     <MudSnackbarProvider />
     <MudPopoverProvider />
 
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
+    <audio id="player" autoplay loop>
+        <source src="sounds/music.ogg" type="audio/ogg">
+     </audio>
+    <div class="page">
+        <main class="main-wrap">
+            <div class="main-bg-panel"></div>
+            <article class="content px-4">
+                @Body
+            </article>
+        </main>
     </div>
 
-    <main>
-        <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
-        </div>
-
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
-</div>
-
-<div id="blazor-error-ui" data-nosnippet>
-    An unhandled error has occurred.
-    <a href="." class="reload">Reload</a>
-    <span class="dismiss">🗙</span>
-</div>
+    <div id="blazor-error-ui" data-nosnippet>
+        An unhandled error has occurred.
+        <a href="." class="reload">Reload</a>
+        <span class="dismiss">🗙</span>
+    </div>
 </MudLayout>
 
 @code {
-
+  
     MudTheme _customTheme = new MudTheme()
         {
+            Typography = new Typography()
+            {
+                Default = new Default()
+                {
+                    FontFamily = new[] { "Orbitron", "Courier New", "Helvetica", "Arial", "sans-serif" }
+                }
+            },
             PaletteLight = new PaletteLight()
             {
+                
                 Primary = "#FE7101",
                 PrimaryLighten = "#FCB076",
                 PrimaryDarken = "#592600",
@@ -44,6 +49,21 @@
                 SecondaryDarken = "#8E7201",
                 Info = "#00FFFF",
                 Error = "#FE0004"
-            }
+            },
+            PaletteDark = new PaletteDark()
+            {
+                Primary = "#FE7101",
+                PrimaryLighten = "#FCB076",
+                PrimaryDarken = "#592600",
+                Background = "#000001",
+                TextPrimary = "#d7d7e4",
+                TextSecondary = "#b4cfbc",
+                TextDisabled = "#969a9a",
+                Secondary = "#FECE01",
+                SecondaryLighten = "#FCE899",
+                SecondaryDarken = "#8E7201",
+                Info = "#00FFFF",
+                Error = "#FE0004"
+            },
         };
 }

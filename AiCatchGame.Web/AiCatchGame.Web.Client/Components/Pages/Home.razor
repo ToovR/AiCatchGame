@@ -1,0 +1,57 @@
+@page "/"
+
+@* @page "/home"
+ *@
+
+
+<h1>Catch the AI</h1>
+
+<p>
+    <MudTextField Label="Ton pseudo (invisible pendant la partie)" @bind-Value="@PlayerPseudonym" />
+    <MudButton OnClick="SubmitPlayer">Let's gooooo !</MudButton>
+
+</p>
+
+<p style="padding-top:50px">
+    Bienvenue!
+    <br />
+    Le but du jeu est mieux identifier l'IA que ses adversaires.
+</p>
+<h2>Déroulement du tour</h2>
+<h3>Phase de Chat</h3>
+<p>
+    L'aire de jeu est une application de Chat. Le jeu va attribuer aléatoirement à chaque joueur ainsi que l'IA un personnage de l'univers de Star Wars. <br />
+    Pendant une minute, les personnages vont pouvoir discuter dans le chat et essayer a travers les réponses des autres personnages d'essayer d'identifier l'IA.
+</p>
+<h3>Phase de vote</h3>
+<p>
+    Chaque joueur va en 10 secondes sélectionner celui qu'il pense être l'IA.
+</p>
+<h4>Attribution des points</h4>
+<p>
+    <ul style="list-style-type: circle;">
+        <li>
+            A deviné l'IA : (10000 - [Vitesse de réponse en ms])
+        </li>
+        <li>
+            S'est trompé dans la devinette IA : (10000 - [Vitesse de réponse en ms]) * -1
+        </li>
+        <li>
+            S'est fait passé pour l'IA pour un joueur : 10000 points
+        </li>
+    </ul>
+</p>
+<h3>Fin du tour</h3>
+<p>
+    Si une partie des joueurs a identifié l'IA. Seuls eux passent au tour suivant.<br />
+    Si tous les joueurs identifient l'IA, le joueur avec le moins de points est éliminé.
+    <br />
+    Si aucun joueur n'identifie l'IA, le joueur avec le moins de points est éliminé.
+    <br />
+    Si N joueurs ont le même nombre de points, ils passent tous au tour suivant.
+
+</p>
+
+
+
+
