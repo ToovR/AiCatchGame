@@ -14,10 +14,10 @@ namespace AiCatchGame.Web.Client.Components.Pages
         public IPlayerService? PlayerService { get; set; }
 
         [Inject]
-        private NavigationManager? NavigationManager { get; set; }
+        private IJSRuntime? JsRuntime { get; set; }
 
         [Inject]
-        private IJSRuntime? JsRuntime { get; set; }
+        private NavigationManager? NavigationManager { get; set; }
 
         public async Task SubmitPlayer()
         {
@@ -35,6 +35,7 @@ namespace AiCatchGame.Web.Client.Components.Pages
             }
 
             ErrorCodes error = await PlayerService.AddPlayer(PlayerPseudonym);
+
             if (error == ErrorCodes.AlreadyExists)
             {
                 _snackBar.Add($"Le pseudonyme {PlayerPseudonym} est déjà utilisé", Severity.Error);
@@ -45,7 +46,7 @@ namespace AiCatchGame.Web.Client.Components.Pages
                 _snackBar.Add($"Erreur indéfinie rencontrée lors de l'ajout du joueur", Severity.Error);
                 return;
             }
-            //NavigationManager.NavigateTo($"/game");
+            NavigationManager.NavigateTo($"/game");
         }
     }
 }

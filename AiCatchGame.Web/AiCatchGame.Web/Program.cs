@@ -1,10 +1,8 @@
-using AiCatchGame.Web.Components;
 using AiCatchGame.Web.Api;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using AiCatchGame.Web;
+using AiCatchGame.Web.Components;
+using AiCatchGame.Web.Interfaces;
+using AiCatchGame.Web.Services;
 using MudBlazor.Services;
-using Blazored.LocalStorage;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,23 +10,20 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveWebAssemblyComponents();
 
-
- // https://www.c-sharpcorner.com/article/building-a-real-time-chat-application-with-net-core-7-signalr/
+// https://www.c-sharpcorner.com/article/building-a-real-time-chat-application-with-net-core-7-signalr/
 
 builder.Services.AddSignalR();
 builder.Services.AddMudServices();
 builder.Services.AddControllersWithViews();
 
-
-
+builder.Services.AddScoped<IGameService, GameService>();
+builder.Services.AddScoped<IChatService, ChatService>();
 
 var app = builder.Build();
 
-app.MapControllerRoute(
-    name: "default",
-    pattern: "api/{Game}/{action=Index}/{id?}");
 app.MapHub<GameHub>("/gameHub");
 
+app.MapGroup("api/Game").MapGame();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -44,7 +39,6 @@ else
 
 app.UseHttpsRedirection();
 
-
 app.UseAntiforgery();
 
 app.MapStaticAssets();
@@ -53,5 +47,3 @@ app.MapRazorComponents<App>()
     .AddAdditionalAssemblies(typeof(AiCatchGame.Web.Client._Imports).Assembly);
 
 app.Run();
-
-

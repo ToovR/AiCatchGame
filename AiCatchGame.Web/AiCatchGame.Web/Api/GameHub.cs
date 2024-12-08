@@ -2,7 +2,7 @@ using AiCatchGame.Bo;
 using AiCatchGame.Web.Interfaces;
 using Microsoft.AspNetCore.SignalR;
 
-namespace AiCatchGame.Web
+namespace AiCatchGame.Web.Api
 {
     public class GameHub : Hub
     {
@@ -15,25 +15,34 @@ namespace AiCatchGame.Web
 
         public async Task JoinGame(string pseudonym)
         {
-            string privateId = Context.User.Identity.Name;
+            string privateId = Context.ConnectionId;
             Guid publicId = await _gameService.AddPlayerToGame(pseudonym, privateId);
             await Clients.Caller.SendAsync("GameJoined", privateId, publicId);
         }
 
-        public async Task OnReceivedMessage(Action<Guid, string> receivedMessageAction)
+        public override async Task OnConnectedAsync()
         {
+            await base.OnConnectedAsync();
         }
 
-        public async Task OnSetEnd(Action<GameSetResultInfo> setEndAction)
+        public Task OnReceivedMessage(Action<Guid, string> receivedMessageAction)
         {
+            throw new NotImplementedException();
         }
 
-        public async Task OnSetSomeoneVoted(Action<SomeoneVotedInfo> someoneVotedAction)
+        public Task OnSetEnd(Action<GameSetResultInfo> setEndAction)
         {
+            throw new NotImplementedException();
         }
 
-        public async Task OnSetStart(Action<GameSetInfo> setStartAction)
+        public Task OnSetSomeoneVoted(Action<SomeoneVotedInfo> someoneVotedAction)
         {
+            throw new NotImplementedException();
+        }
+
+        public Task OnSetStart(Action<GameSetInfo> setStartAction)
+        {
+            throw new NotImplementedException();
         }
 
         public async Task OnSetStartChat(Action<GameSetChattingInfo> setStartChatAction)
@@ -46,14 +55,14 @@ namespace AiCatchGame.Web
             await Clients.All.SendAsync("SetStartVote", (GameSetVotingInfo gameSetVotingInfo) => setStartVoteAction(gameSetVotingInfo));
         }
 
-        public async Task SendMessage(Guid playerId, string message)
+        public async Task SendMessage(string playerId, string message)
         {
             GameServer game = await _gameService.GetGameByPlayerId(playerId);
             Guid characterId = await _gameService.GetCharacterId(playerId);
 
-            await Clients.Users(game.HumanPlayers.Select(p => p.Id.ToString())).SendAsync("ReceiveMessage", characterId, message);
+            await Clients.Users(game.HumanPlayers.Select(p => p.PrivateId)).SendAsync("ReceiveMessage", characterId, message);
         }
-        
+
         public async Task SendPlayerReady(Guid player)
         {
             await Clients.All.SendAsync("SendPlayerReady", player);
@@ -67,6 +76,9 @@ namespace AiCatchGame.Web
             await Clients.Users(game.PlayerIds).SendAsync("StartGame", gameClient);
         }
 
-        
+        public Task Vote(string playerId, Guid characterId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

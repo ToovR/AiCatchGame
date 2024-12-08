@@ -8,17 +8,16 @@ namespace AiCatchGame.Web.Client.Services
     public class NetClient : INetClient
     {
         private static readonly JsonSerializerOptions _caseInsentive = new() { PropertyNameCaseInsensitive = true };
-        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly HttpClient _httpClient;
 
-        public NetClient(IHttpClientFactory httpClientFactory)
+        public NetClient(HttpClient httpClient)
         {
-            _httpClientFactory = httpClientFactory;
+            _httpClient = httpClient;
         }
 
         public async Task<TOut?> GetAsync<TOut>(string url)
         {
-            using HttpClient client = _httpClientFactory.CreateClient();
-            HttpResponseMessage message = await client.GetAsync(url);
+            HttpResponseMessage message = await _httpClient.GetAsync(url);
             string content = await message.Content.ReadAsStringAsync();
             if (!message.IsSuccessStatusCode)
             {
@@ -32,8 +31,7 @@ namespace AiCatchGame.Web.Client.Services
 
         public async Task<TOut?> PostAsync<TIn, TOut>(string url, TIn body)
         {
-            using HttpClient client = _httpClientFactory.CreateClient();
-            HttpResponseMessage message = await client.PostAsJsonAsync<TIn>(url, body);
+            HttpResponseMessage message = await _httpClient.PostAsJsonAsync<TIn>(url, body);
             string content = await message.Content.ReadAsStringAsync();
             if (!message.IsSuccessStatusCode)
             {

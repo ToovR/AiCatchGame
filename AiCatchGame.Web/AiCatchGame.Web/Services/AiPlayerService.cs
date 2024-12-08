@@ -1,18 +1,17 @@
 using AiCatchGame.Bo;
 using AiCatchGame.Web.Interfaces;
-using System.Timers;
 
-namespace AiCatchGame.Web.Bll
+namespace AiCatchGame.Web.Services
 {
     public class AiPlayerService
     {
+        private List<AiPlayer> _aiPlayers = [];
         private IChatService _chatService;
 
         private DateTime _lastMessageTime;
         private List<ChatMessage> _messages = [];
         private Queue<AiChatMessage> _messagesToSend = [];
         private Queue<string> _responses = [];
-        private List<AiPlayer> _aiPlayers = [];
 
         private string defaultSystemMessage =
         """
@@ -28,7 +27,6 @@ met quelques fautes d orthographe dans tes réponses.
 Pour certaines informations pas évidentes pour un humain à donner comme ca, tu dois faire croire que tu n'as pas la réponse sous la main
 dans chacune de tes réponses, inclut tout au debut une indication sur le temps qu'un humain mettrait à écrire la réponse sous la forme [TEMPS:XXs]
 """;
-
 
         public AiPlayerService(IChatService chatService)
         {
@@ -74,20 +72,20 @@ dans chacune de tes réponses, inclut tout au debut une indication sur le temps 
                 string response = await TreatInAi(player, message);
 
                 double delay = DefineDelay(message);
-                AiChatMessage aiChatMessage = new AiChatMessage(player.Id, response, delay);
+                AiChatMessage aiChatMessage = new AiChatMessage(player.PrivateId, response, delay);
                 _messagesToSend.Enqueue(aiChatMessage);
             }
-        }
-
-        private async Task<string> TreatInAi(AiPlayer player, ChatMessage message)
-        {
-            throw new NotImplementedException();
         }
 
         private double DefineDelay(ChatMessage message)
         {
             // TODO Define delay while considering other players delay
-           return ((double)new Random().Next(500, 2000)) / 1000;
+            return ((double)new Random().Next(500, 2000)) / 1000;
+        }
+
+        private Task<string> TreatInAi(AiPlayer player, ChatMessage message)
+        {
+            throw new NotImplementedException();
         }
 
         private string? TreatResponse(AiChatMessage message)

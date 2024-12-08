@@ -2,14 +2,12 @@ using AiCatchGame.Bo;
 using AiCatchGame.Web.Helpers;
 using AiCatchGame.Web.Interfaces;
 
-namespace AiCatchGame.Web.Bll
+namespace AiCatchGame.Web.Services
 {
     public class GameSetService
     {
-        public GameSetService(IGameService game)
-        {
-            _game = game;
-        }
+        private readonly IGameService _game;
+
         private List<string> _poolCharacterNames = [ "Luke", "Leia", "Han", "Chewbacca", "Obi-Wan", "Anakin", "Padmé", "Yoda",
             "Darth Vader", "R2-D2", "C-3PO", "Lando", "Boba Fett", "Jabba", "Wedge",
             "Mace Windu", "Qui-Gon Jinn", "Darth Maul", "Jar Jar Binks", "Count Dooku",
@@ -19,22 +17,23 @@ namespace AiCatchGame.Web.Bll
             "Bodhi Rook", "Galen Erso", "Mon Mothma", "Bail Organa", "Jango Fett",
             "Darth Sidious", "Darth Tyranus", "Darth Plagueis", "Darth Bane", "Darth Revan",
             "Darth Malak", "Darth Nihilus", "Darth Sion", "Darth Traya", "Darth Malgus"];
-        private readonly IGameService _game;
 
-        public GameSet GetGameSet(Guid id)
+        public GameSetService(IGameService game)
         {
-            IEnumerable<GameServer> games = _game.GetGames();
-            return games.SelectMany(g => g.GameSets).Single(gs => gs.Id == id);
+            _game = game;
         }
-        public async Task EndChatPhase(Guid gameSetId)
+
+        public Task EndChatPhase(Guid gameSetId)
         {
             GameSet gameSet = GetGameSet(gameSetId);
             gameSet.Status = GameSetStatuses.Voting;
+            throw new NotImplementedException();
             // TODO Notify vote
         }
 
-        public async Task EndSetPhase(Guid gameSetId)
+        public Task EndSetPhase(Guid gameSetId)
         {
+            throw new NotImplementedException();
             // TODO Calculate scores
             // TODO calculate losers
             // TODO determine if game is over
@@ -42,7 +41,13 @@ namespace AiCatchGame.Web.Bll
             // TODO Notify vote
         }
 
-        public async Task InitializeSet(GameServer game)
+        public GameSet GetGameSet(Guid id)
+        {
+            IEnumerable<GameServer> games = _game.GetGames();
+            return games.SelectMany(g => g.GameSets).Single(gs => gs.Id == id);
+        }
+
+        public Task InitializeSet(GameServer game)
         {
             int roundNumber = (game.GameSets.MaxOrDefault(s => s.RoundNumber) ?? 0) + 1;
             GameSet newGameSet = new(roundNumber, Guid.NewGuid());
@@ -57,10 +62,11 @@ namespace AiCatchGame.Web.Bll
 
                 string characterName = remainingCharacterNames[index];
                 remainingCharacterNames.RemoveAt(index);
-                newGameSet.PlayerSetInfoList.Add(new PlayerSetInfo(p.Id, characterName));
+                newGameSet.PlayerSetInfoList.Add(new PlayerSetInfo(p.PrivateId, characterName, Guid.NewGuid()));
             });
 
             newGameSet.Status = GameSetStatuses.Chatting;
+            throw new NotImplementedException();
             // TODO Initialize Timer of chat
             // TODO Notify set start
         }

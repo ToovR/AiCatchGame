@@ -8,8 +8,8 @@ namespace AiCatchGame.Bo
             Content = content;
         }
 
-        public string Content { get; }
         public CharacterInfo Character { get; set; }
+        public string Content { get; }
         public DateTime? Time { get; set; }
     }
 }

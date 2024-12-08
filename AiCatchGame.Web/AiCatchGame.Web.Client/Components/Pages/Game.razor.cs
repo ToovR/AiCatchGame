@@ -1,7 +1,6 @@
 using AiCatchGame.Bo;
 using AiCatchGame.Web.Client.Interfaces;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.SignalR.Client;
 using MudBlazor;
 
 namespace AiCatchGame.Web.Client.Components.Pages
@@ -10,13 +9,11 @@ namespace AiCatchGame.Web.Client.Components.Pages
     {
         private Dictionary<Guid, string>? _characters;
         private CharacterInfo? _currentCharacter;
-        private HubConnectionBuilder? _gameHubConnection;
         private string _message = "";
         private List<string> _messages = [];
         private CharacterInfo[]? _otherCharacters;
         private PlayerGameSetResultInfo? _playerResultInfo;
         private GameSetResultInfo? _setResult;
-        private string? messageInput;
         public GameSet? CurrentSet { get; set; }
         public Guid? GameId { get; set; }
         public Guid? PlayerId { get; set; }
@@ -86,7 +83,7 @@ namespace AiCatchGame.Web.Client.Components.Pages
         private async Task InitializeLobbyState()
         {
             ArgumentNullException.ThrowIfNull(PlayerService);
-            ArgumentNullException.ThrowIfNull(GameData);
+            GameData = new GameClient(GameStatuses.InLobby);
             PlayerService.OnGameStart((Bo.GameClient data) => GameData = data);
             PlayerService.OnSetStart(async (GameSetInfo gameSet) => await InitializeSet(gameSet));
             PlayerService.OnSetStartChat(async (GameSetChattingInfo chatInfo) => await InitializeChat(chatInfo));

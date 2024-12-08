@@ -11,6 +11,5 @@
 
             return source.Max(selector);
         }
-
     }
 }

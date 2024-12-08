@@ -2,11 +2,11 @@ using AiCatchGame.Bo;
 using AiCatchGame.Web.Interfaces;
 using Microsoft.AspNetCore.SignalR.Client;
 
-namespace AiCatchGame.Web.Bll
+namespace AiCatchGame.Web.Services
 {
     public class ChatService : IChatService
     {
-        public async Task PostMessage(Guid playerId, string message)
+        public async Task PostMessage(string playerId, string message)
         {
 
             var connection = new HubConnectionBuilder()

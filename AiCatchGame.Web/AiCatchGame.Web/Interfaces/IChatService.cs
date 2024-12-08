@@ -2,6 +2,6 @@
 {
     public interface IChatService
     {
-        Task PostMessage(Guid playerId, string message);
+        Task PostMessage(string playerId, string message);
     }
 }

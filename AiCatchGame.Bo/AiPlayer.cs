@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace AiCatchGame.Bo
+﻿namespace AiCatchGame.Bo
 {
     public class AiPlayer : Player
     {
+        public AiPlayer(string privateId) : base(privateId)
+        {
+        }
     }
 }

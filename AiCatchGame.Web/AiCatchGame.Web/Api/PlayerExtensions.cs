@@ -1,11 +1,14 @@
 using AiCatchGame.Web.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
-public static class PlayerExtensions
+namespace AiCatchGame.Web.Api
 {
-    public static RouteGroupBuilder MapPlayer(this RouteGroupBuilder group)
+    public static class PlayerExtensions
     {
-        //group.MapPost("", async ([FromBody] string pseudonym, IGameService gameService) => await gameService.AddPlayerToGame(pseudonym));
-        return group;
+        public static RouteGroupBuilder MapPlayer(this RouteGroupBuilder group)
+        {
+            //group.MapPost("", async ([FromBody] string pseudonym, IGameService gameService) => await gameService.AddPlayerToGame(pseudonym));
+            return group;
+        }
     }
 }

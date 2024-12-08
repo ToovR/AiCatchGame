@@ -2,14 +2,12 @@ namespace AiCatchGame.Bo
 {
     public class HumanPlayer : Player
     {
-        public HumanPlayer(string privateId, string pseudonym)
+        public HumanPlayer(string privateId, string pseudonym) : base(privateId)
         {
-            PrivateId = privateId;
-            Pseudonym = Pseudonym;
+            Pseudonym = pseudonym;
             PublicId = Guid.NewGuid();
         }
 
-        public string PrivateId { get; }
         public string Pseudonym { get; }
         public Guid PublicId { get; }
     }

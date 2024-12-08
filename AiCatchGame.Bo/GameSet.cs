@@ -10,9 +10,9 @@ namespace AiCatchGame.Bo
         }
 
         public Guid Id { get; }
+        public List<PlayerSetInfo> PlayerSetInfoList { get; set; }
         public int RoundNumber { get; }
 
         public GameSetStatuses Status { get; set; }
-        public List<PlayerSetInfo> PlayerSetInfoList { get; set; }
     }
 }

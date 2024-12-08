@@ -1,19 +1,15 @@
 using AiCatchGame.Bo;
 using AiCatchGame.Bo.Exceptions;
 using AiCatchGame.Web.Interfaces;
-using System.Globalization;
 
-namespace AiCatchGame.Web.Bll
+namespace AiCatchGame.Web.Services
 {
     public class GameService : IGameService
     {
-        private List<GameServer> _games = [];
-
         private const int LOBBY_PLAYER_WAIING_SECONDS = 5;
-
         private const int PLAYERS_MAX = 10;
-
         private const int PLAYERS_MIN = 5;
+        private static List<GameServer> _games = [];
 
         public async Task<Guid> AddPlayerToGame(string pseudonym, String privateId)
         {
@@ -33,9 +29,28 @@ namespace AiCatchGame.Web.Bll
             return humanPlayer.PublicId;
         }
 
+        public async Task<Guid> GetCharacterId(string playerId)
+        {
+            GameServer game = await GetGameByPlayerId(playerId);
+            PlayerSetInfo? playerSetInfo = game.GameSets.Last().PlayerSetInfoList.FirstOrDefault(ps => ps.PlayerId == playerId);
+            ArgumentNullException.ThrowIfNull(playerSetInfo);
+            return playerSetInfo.CharacterId;
+        }
+
         public Task<GameServer> GetGameById(Guid gameId)
         {
             return Task.FromResult(_games.Single(g => g.Id == gameId));
+        }
+
+        public Task<GameServer> GetGameByPlayerId(string playerId)
+        {
+            GameServer game = _games.First(g => g.PlayerIds.Any(p => playerId == p));
+            return Task.FromResult(game);
+        }
+
+        public IEnumerable<GameServer> GetGames()
+        {
+            return _games;
         }
 
         public Task<GameServer[]> GetGamesToStart()
@@ -46,9 +61,9 @@ namespace AiCatchGame.Web.Bll
             return Task.FromResult(gamesToStart);
         }
 
-        public async Task<HumanPlayer> GetPlayerById(Guid playerId)
+        public Task<HumanPlayer> GetPlayerById(string playerId)
         {
-            return _games.Select(g => g.HumanPlayers.First(p => p.Id == playerId)).First();
+            return Task.FromResult(_games.Select(g => g.HumanPlayers.First(p => p.PrivateId == playerId)).First());
         }
 
         public Task StartGame(Guid gameId)
@@ -59,27 +74,12 @@ namespace AiCatchGame.Web.Bll
             return Task.CompletedTask;
         }
 
-        private async Task<GameServer> InitializeGame()
+        private Task<GameServer> InitializeGame()
         {
             GameServer newGame = new();
-            AiPlayer aiPlayer = new();
+            AiPlayer aiPlayer = new("Ai1");
             newGame.AiPlayers = [aiPlayer];
-            return newGame;
-        }
-
-        public Task<GameServer> GetGameByPlayerId(Guid playerId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<Guid> GetCharacterId(Guid playerId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<GameServer> GetGames()
-        {
-            return _games;
+            return Task.FromResult(newGame);
         }
     }
 }

@@ -6,7 +6,7 @@ namespace AiCatchGame.Web.HostedServices
 {
     public class GameHostedService : IHostedService, IDisposable
     {
-        private HubConnection _gameHubConnection;
+        private HubConnection? _gameHubConnection;
         private IServiceScopeFactory _serviceScopeFactory;
         private Timer? _timer = null;
 
@@ -52,6 +52,7 @@ namespace AiCatchGame.Web.HostedServices
 
         private async Task TreatGamesInLobby(IGameService gameService)
         {
+            ArgumentNullException.ThrowIfNull(_gameHubConnection);
             GameServer[] games = await gameService.GetGamesToStart();
             foreach (GameServer game in games)
             {

@@ -6,12 +6,16 @@ namespace AiCatchGame.Web.Interfaces
     {
         Task<Guid> AddPlayerToGame(string pseudonym, string privateId);
 
+        Task<Guid> GetCharacterId(string playerId);
+
         Task<GameServer> GetGameById(Guid gameId);
 
-        Task<GameServer> GetGameByPlayerId(Guid playerId);
-        Task<GameServer[]> GetGamesToStart();
-        Task<Guid> GetCharacterId(Guid playerId);
-        Task StartGame(Guid id);
+        Task<GameServer> GetGameByPlayerId(string playerId);
+
         IEnumerable<GameServer> GetGames();
+
+        Task<GameServer[]> GetGamesToStart();
+
+        Task StartGame(Guid id);
     }
 }

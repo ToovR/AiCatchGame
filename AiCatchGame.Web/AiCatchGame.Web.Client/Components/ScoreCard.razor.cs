@@ -5,6 +5,6 @@ namespace AiCatchGame.Web.Client.Components
     public partial class ScoreCard
     {
         [Parameter]
-        public Bo.GameClient? GameData { get; set; }
+        public AiCatchGame.Bo.GameClient? GameData { get; set; }
     }
 }

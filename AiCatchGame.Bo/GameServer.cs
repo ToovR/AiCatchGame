@@ -8,8 +8,10 @@ namespace AiCatchGame.Bo
         public List<HumanPlayer> HumanPlayers { get; set; } = [];
         public Guid Id { get; } = Guid.NewGuid();
         public DateTime LastAddedPlayerTime { get; set; }
+
         public IEnumerable<string> PlayerIds
         { get { return HumanPlayers.Select(p => p.PrivateId); } }
+
         public GameStatuses Status { get; set; }
     }
 }
