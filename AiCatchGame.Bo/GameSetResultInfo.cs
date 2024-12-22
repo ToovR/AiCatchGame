@@ -2,7 +2,7 @@ namespace AiCatchGame.Bo
 {
     public class GameSetResultInfo
     {
-        public AiGameSetResultInfo AiInfo { get; set; }
-        public IEnumerable<PlayerGameSetResultInfo> Players { get; set; } = [];
+        public AiGameSetResultInfo[] AiInfoList { get; set; } = [];
+        public IEnumerable<HumanPlayerGameSetResultInfo> HumanPlayers { get; set; } = [];
     }
 }

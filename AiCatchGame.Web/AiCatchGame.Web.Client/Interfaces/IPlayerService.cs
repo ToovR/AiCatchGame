@@ -13,21 +13,21 @@ namespace AiCatchGame.Web.Client.Interfaces
 
         Task NotifyReady();
 
-        void OnGameStart(Action<GameClient> gameAction);
+        Task OnGameStart(Func<GameClient, Task> gameAction);
 
-        void OnNewPlayer(Action<string> onNewPlayer);
+        Task OnNewPlayer(Func<string, Task> onNewPlayer);
 
-        void OnReceivedMessage(Action<Guid, string> receivedMessageAction);
+        Task OnReceivedMessage(Func<Guid, string, Task> receivedMessageAction);
 
-        Task OnSetEnd(Func<GameSetResultInfo, PlayerGameSetResultInfo, Task> setEndAction);
+        Task OnSetSomeoneVoted(Func<SomeoneVotedInfo, Task> someoneVotedAction);
 
-        void OnSetSomeoneVoted(Action<SomeoneVotedInfo> someoneVotedAction);
+        Task OnSetStart(Func<GameSetClient, Task> setStartAction);
 
-        void OnSetStart(Action<GameSetClient> setStartAction);
+        Task OnSetStartChat(Func<GameSetChattingInfo, Task> setStartChatAction);
 
-        void OnSetStartChat(Action<GameSetChattingInfo> setStartChatAction);
+        Task OnSetStartVote(Func<GameSetVotingInfo, Task> setStartVoteAction);
 
-        void OnSetStartVote(Action<GameSetVotingInfo> setStartVoteAction);
+        Task OnShowScore(Func<GameSetResultInfo, Task> setEndAction);
 
         Task SendMessage(string message);
 

@@ -10,5 +10,6 @@ namespace AiCatchGame.Bo
 
         public string Pseudonym { get; }
         public Guid PublicId { get; }
+        public List<HumanPlayerGameSetResultInfo> SetResults { get; set; } = [];
     }
 }

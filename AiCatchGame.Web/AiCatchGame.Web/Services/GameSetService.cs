@@ -52,23 +52,22 @@ namespace AiCatchGame.Web.Services
             int roundNumber = (game.GameSets.MaxOrDefault(s => s.RoundNumber) ?? 0) + 1;
             GameSetServer newGameSet = new(roundNumber, Guid.NewGuid());
             game.GameSets.Add(newGameSet);
-            List<Player> remainingPlayers = game.HumanPlayers.Cast<Player>().Concat(game.AiPlayers.Cast<Player>()).Where(p => p.Status != PlayerStatuses.Lost).ToList();
+            List<Player> players = game.HumanPlayers.Cast<Player>().Concat(game.AiPlayers.Cast<Player>()).ToList();
 
             List<string> remainingCharacterNames = ((string[])_poolCharacterNames.ToArray().Clone()).ToList();
-            remainingPlayers.ForEach(p =>
+            players.ForEach(p =>
             {
                 p.GameStatus = GameStatuses.Playing;
                 int index = (new Random()).Next(remainingCharacterNames.Count);
 
                 string characterName = remainingCharacterNames[index];
                 remainingCharacterNames.RemoveAt(index);
-                newGameSet.PlayerSetInfoList.Add(new PlayerSetInfo(p.PrivateId, characterName, Guid.NewGuid()));
+                newGameSet.PlayerSetInfoList.Add(new PlayerSetInfo(p.PrivateId, characterName, Guid.NewGuid(), p is AiPlayer));
             });
 
             newGameSet.Status = GameSetStatuses.Chatting;
-            // TODO Initialize Timer of chat
-            // TODO Notify set start
-            return null;
+            newGameSet.ChattingStartTime = DateTime.Now;
+            return Task.FromResult(newGameSet);
         }
     }
 }

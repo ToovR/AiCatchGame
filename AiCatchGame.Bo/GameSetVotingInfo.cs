@@ -1,8 +1,4 @@
 namespace AiCatchGame.Bo
 {
-    public class GameSetVotingInfo
-    {
-        public IEnumerable<CharacterInfo> Characters { get; set; }
-        public int Duration { get; set; }
-    }
+    public record GameSetVotingInfo(CharacterInfo[] Characters, int Duration);
 }

@@ -7,13 +7,12 @@ namespace AiCatchGame.Web.Client.Components.Pages
 {
     public partial class Game
     {
+        private readonly List<string> _lobbyMessages = [];
         private Dictionary<Guid, string>? _characters;
         private CharacterInfo? _currentCharacter;
-        private List<string> _lobbyMessages = [];
         private string _message = "";
         private List<string> _messages = [];
         private CharacterInfo[]? _otherCharacters;
-        private PlayerGameSetResultInfo? _playerResultInfo;
         private GameSetResultInfo? _setResult;
         public GameSetClient? CurrentSet { get; set; }
         public Guid? GameId { get; set; }
@@ -31,7 +30,7 @@ namespace AiCatchGame.Web.Client.Components.Pages
         protected string GetPlayersStringById(Guid[] playerIds)
         {
             ArgumentNullException.ThrowIfNull(_setResult);
-            string[] names = playerIds.Select(id => _setResult.Players.Single(p => p.PlayerId == id).Name).ToArray();
+            string[] names = playerIds.Select(id => _setResult.HumanPlayers.Single(p => p.PlayerId == id).Pseudonym).ToArray();
             if (names.Length == 0)
             {
                 return "Personne";
@@ -85,27 +84,29 @@ namespace AiCatchGame.Web.Client.Components.Pages
         {
             ArgumentNullException.ThrowIfNull(PlayerService);
             GameData = new GameClient(GameStatuses.InLobby);
-            PlayerService.OnGameStart((Bo.GameClient data) =>
+            await PlayerService.OnGameStart((Bo.GameClient data) =>
             {
                 GameData = data;
                 this.StateHasChanged();
+                return Task.CompletedTask;
             });
-            PlayerService.OnSetStart(async (GameSetClient gameSet) => await InitializeSet(gameSet));
-            PlayerService.OnSetStartChat(async (GameSetChattingInfo chatInfo) => await InitializeChat(chatInfo));
-            PlayerService.OnSetStartVote(async (GameSetVotingInfo voteInfo) => await InitializeVote(voteInfo));
-            await PlayerService.OnSetEnd(InitializeSetEnd);
-            PlayerService.OnSetSomeoneVoted(async (SomeoneVotedInfo someoneVotedInfo) => await OnSomeoneVoted(someoneVotedInfo));
-            PlayerService.OnReceivedMessage(async (Guid characterId, string message) => await AddMessage(characterId, message));
-            PlayerService.OnNewPlayer(async (string pseudonym) =>
+            await PlayerService.OnSetStart(InitializeSet);
+            await PlayerService.OnSetStartChat(InitializeChat);
+            await PlayerService.OnSetStartVote(InitializeVote);
+            await PlayerService.OnShowScore(InitializeShowScore);
+            await PlayerService.OnSetSomeoneVoted(OnSomeoneVoted);
+            await PlayerService.OnReceivedMessage(AddMessage);
+            await PlayerService.OnNewPlayer((string pseudonym) =>
             {
                 _lobbyMessages.Add($"{pseudonym} s'est joint à la partie.");
                 this.StateHasChanged();
+                return Task.CompletedTask;
             });
 
             await PlayerService.NotifyReady();
         }
 
-        private async Task InitializeSet(GameSetClient gameSet)
+        private Task InitializeSet(GameSetClient gameSet)
         {
             ArgumentNullException.ThrowIfNull(PlayerService);
             CurrentSet = gameSet;
@@ -113,14 +114,15 @@ namespace AiCatchGame.Web.Client.Components.Pages
             _characters = gameSet.Characters.ToDictionary(c => c.Id, c => c.Name);
             TimerRemaining = 10;
             CurrentSet.Status = GameSetStatuses.CharacterAttribution;
+            return Task.CompletedTask;
         }
 
-        private Task InitializeSetEnd(GameSetResultInfo resultInfo, PlayerGameSetResultInfo playerInfo)
+        private Task InitializeShowScore(GameSetResultInfo resultInfo)
         {
             ArgumentNullException.ThrowIfNull(CurrentSet);
             _setResult = resultInfo;
-            _playerResultInfo = playerInfo;
             CurrentSet.Status = GameSetStatuses.End;
+            this.StateHasChanged();
             return Task.CompletedTask;
         }
 
@@ -131,6 +133,7 @@ namespace AiCatchGame.Web.Client.Components.Pages
             TimerRemaining = voteInfo.Duration;
             _otherCharacters = voteInfo.Characters.Where(c => c.Id != _currentCharacter.Id).ToArray();
             CurrentSet.Status = GameSetStatuses.Voting;
+            this.StateHasChanged();
             return Task.CompletedTask;
         }
 

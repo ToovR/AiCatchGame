@@ -4,18 +4,24 @@ namespace AiCatchGame.Web.Client.Interfaces
 {
     public interface IHubClientService
     {
-        void OnGameJoined(Action<string, Guid> handler);
+        Task OnGameJoined(Func<string, Guid, Task> handler);
 
-        void OnGameStart(Action<GameClient> gameAction);
+        Task OnGameStart(Func<GameClient, Task> gameAction);
 
-        void OnNewPlayer(Action<string> onNewPlayer);
+        Task OnNewPlayer(Func<string, Task> onNewPlayer);
 
-        void OnReceivedMessage(Action<Guid, string> receivedMessageAction);
+        Task OnReceivedMessage(Func<Guid, string, Task> receivedMessageAction);
 
-        void OnSetStart(Action<GameSetClient> setStartAction);
+        Task OnSetShowScore(Func<GameSetResultInfo, Task> setShowScoreAction);
+
+        Task OnSetStart(Func<GameSetClient, Task> setStartAction);
+
+        Task OnSetStartVote(Func<GameSetVotingInfo, Task> setStartVoteAction);
 
         Task SendPlayerReady(string playerId);
 
         Task StartJoinGame(string pseudonym);
+
+        Task Vote(string playerId, Guid characterVotedId);
     }
 }

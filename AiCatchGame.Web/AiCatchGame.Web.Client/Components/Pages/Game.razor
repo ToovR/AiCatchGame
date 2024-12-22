@@ -65,28 +65,40 @@ else @* if (Game.Status == GameStatus.Playing) *@
                 <MudButton OnClick="@(async () => await VoteFor(character.Id))">@character.Name</MudButton>
             }
         }
-        else if (CurrentSet.Status == GameSetStatuses.End && _setResult != null && _playerResultInfo != null)
+        else if (CurrentSet.Status == GameSetStatuses.End && _setResult != null)
         {
 
 
-            <MudText>L'IA était <span class="suspenseOpen">@_setResult.AiInfo.Character.Name</span></MudText>
-            @foreach (PlayerGameSetResultInfo player in _setResult.Players)
+            @foreach (AiGameSetResultInfo aiPlayer in _setResult.AiInfoList)
+            {
+                <MudText>L'IA était <span class="suspenseOpen">@aiPlayer.Character.Name</span></MudText>
+            }
+            @foreach (HumanPlayerGameSetResultInfo humanPlayer in _setResult.HumanPlayers)
             {
                 <MudText>
-                    <span class="emph">@player.Name</span> qui jouait <span class="emph">@GetCharacterNameById(player.CharacterId)</span>
-                    a voté en <span class="emph">@player.VoteReaction.ToString("s.ff")s</span> pour <span class="@(player.HasFoundAi ? "success" : "failure") emph"> @GetCharacterNameById(player.CharacterId)</span>
-                    <span class="point emph @(player.ScoreVote > 0 ? "success" : "failure")">@player.ScoreVote</span>
+                    <span class="emph">@humanPlayer.Pseudonym</span> qui jouait <span class="emph">@GetCharacterNameById(humanPlayer.CharacterId)</span>
+                    @if (humanPlayer.VoteReaction == null)
+                    {
+                        <span>n'a pas voté</span>
+                    }
+                    else 
+                    {
+                        <span>a voté en </span><span class="emph">@humanPlayer.VoteReaction.Value.ToString()s</span>
+                       <span> pour </span><span class="@(humanPlayer.HasFoundAi ? "success" : "failure") emph"> @GetCharacterNameById(humanPlayer.CharacterId)</span>
+                    }
+
+                    <span class="point emph @(humanPlayer.ScoreVote > 0 ? "success" : "failure")">@humanPlayer.ScoreVote</span>
                 </MudText>
                 <MudText>
-                    <span class="emph @(player.ScoreVote > 0 ? "success" : "failure")">
-                        @GetPlayersStringById(player.PlayerIdsVotedFor)
+                    <span class="emph @(humanPlayer.ScoreVote > 0 ? "success" : "failure")">
+                        @GetPlayersStringById(humanPlayer.PlayerIdsVotedFor)
 
                     </span>
-                    @if (player.PlayerIdsVotedFor.Length == 0)
+                    @if (humanPlayer.PlayerIdsVotedFor.Length == 0)
                     {
                         <span>n'a</span>
                     }
-                    else if (player.PlayerIdsVotedFor.Length == 1)
+                    else if (humanPlayer.PlayerIdsVotedFor.Length == 1)
                     {
                         <span>a</span>
                     }
@@ -95,11 +107,10 @@ else @* if (Game.Status == GameStatus.Playing) *@
                         <span>ont</span>
                     }
                     <span> voté pour </span><span class="emph">@_currentCharacter.Name</span>
-                    <span class="point emph @(player.ScoreVotedAsAi > 0 ? "success" : "failure")">@player.ScoreVotedAsAi</span>
+                    <span class="point emph @(humanPlayer.ScoreVotedAsAi > 0 ? "success" : "failure")">@humanPlayer.ScoreVotedAsAi</span>
                 </MudText>
-                <MudText>Ce qui fait <span class="point emph @(player.ScoreSet > 0 ? "success" : "neg")">@player.ScoreSet</span> points pour ce tour</MudText>
-                <MudText>Soit un total de <span class="point emph @(player.ScoreTotal > 0 ? "success" : "failure")">@player.ScoreTotal</span> points.</MudText>
-                <MudText><span class="result emph @(player.Status != PlayerStatuses.Lost ? "success" : "failure")">@player.Name est @(player.Status != PlayerStatuses.Lost ? "qualifié(e)" : "élmiminé(e)")</span></MudText>
+                <MudText>Ce qui fait <span class="point emph @(humanPlayer.ScoreSet > 0 ? "success" : "neg")">@humanPlayer.ScoreSet</span> points pour ce tour</MudText>
+                <MudText>Soit un total de <span class="point emph @(humanPlayer.ScoreTotal > 0 ? "success" : "failure")">@humanPlayer.ScoreTotal</span> points.</MudText>
             }
         }
     }

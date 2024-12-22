@@ -5,7 +5,5 @@ namespace AiCatchGame.Bo
         None,
         Waiting,
         Playing,
-        Won,
-        Lost
     }
 }

@@ -1,4 +1,5 @@
 ﻿using AiCatchGame.Bo;
+using AiCatchGame.Web.Client.Components.Pages;
 
 namespace AiCatchGame.Web.Interfaces
 {
@@ -15,6 +16,12 @@ namespace AiCatchGame.Web.Interfaces
         IEnumerable<GameServer> GetGames();
 
         Task<GameServer[]> GetGamesToStart();
+
+        Task<GameServer[]> GetGamesToStopChat();
+
+        Task<GameServer[]> GetGamesToStopVote();
+
+        Task<GameSetResultInfo> GetSetResultInfo(Guid gameId);
 
         Task<GameSetServer> InitializeSetInfo(Guid gameId);
 

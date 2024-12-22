@@ -50,6 +50,8 @@ namespace AiCatchGame.Web.HostedServices
             using IServiceScope scope = _serviceScopeFactory.CreateScope();
             IGameService gameService = scope.ServiceProvider.GetRequiredService<IGameService>();
             await TreatGamesInLobby(gameService);
+            await TreatGameSetChatToStop(gameService);
+            await TreatGameSetVoteToStop(gameService);
         }
 
         private string GetDefaultAddres()
@@ -69,6 +71,34 @@ namespace AiCatchGame.Web.HostedServices
             return gameHubConnection;
         }
 
+        private async Task TreatGameSetChatToStop(IGameService gameService)
+        {
+            ArgumentNullException.ThrowIfNull(_gameHubConnection);
+            if (_gameHubConnection.State != HubConnectionState.Connected)
+            {
+                await _gameHubConnection.StartAsync();
+            }
+            GameServer[] games = await gameService.GetGamesToStopChat();
+            foreach (GameServer game in games)
+            {
+                await _gameHubConnection.SendAsync("SetEndChat", game.Id);
+            }
+        }
+
+        private async Task TreatGameSetVoteToStop(IGameService gameService)
+        {
+            ArgumentNullException.ThrowIfNull(_gameHubConnection);
+            if (_gameHubConnection.State != HubConnectionState.Connected)
+            {
+                await _gameHubConnection.StartAsync();
+            }
+            GameServer[] games = await gameService.GetGamesToStopVote();
+            foreach (GameServer game in games)
+            {
+                await _gameHubConnection.SendAsync("SetEndVote", game.Id);
+            }
+        }
+
         private async Task TreatGamesInLobby(IGameService gameService)
         {
             ArgumentNullException.ThrowIfNull(_gameHubConnection);
@@ -79,7 +109,7 @@ namespace AiCatchGame.Web.HostedServices
             GameServer[] games = await gameService.GetGamesToStart();
             foreach (GameServer game in games)
             {
-                await _gameHubConnection.SendAsync("StartGame", game.Id);
+                await _gameHubConnection.SendAsync("GameStart", game.Id);
             }
         }
     }
