@@ -3,18 +3,18 @@ using Blazored.LocalStorage;
 
 namespace AiCatchGame.Web.Client.Services
 {
-    public class StorageService : IStorageService
+    public class StorageService(ILocalStorageService localStorageService) : IStorageService
     {
-        private ILocalStorageService _localStorage;
-
-        public StorageService(ILocalStorageService localStorageService)
-        {
-            _localStorage = localStorageService;
-        }
+        private readonly ILocalStorageService _localStorage = localStorageService;
 
         public async Task<T?> Get<T>(LocalStorageKeys key)
         {
             return await _localStorage.GetItemAsync<T>(key.ToString());
+        }
+
+        public async Task Remove(LocalStorageKeys key)
+        {
+            await _localStorage.RemoveItemAsync(key.ToString());
         }
 
         public async Task Set<T>(LocalStorageKeys key, T value)

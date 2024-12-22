@@ -1,17 +1,23 @@
 ﻿using AiCatchGame.Bo;
 using AiCatchGame.Web.Interfaces;
+using Microsoft.AspNetCore.Hosting.Server;
+using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.SignalR.Client;
 
 namespace AiCatchGame.Web.HostedServices
 {
     public class GameHostedService : IHostedService, IDisposable
     {
+        private readonly IHostApplicationLifetime _hostApplicationLifetime;
+        private readonly IServer _server;
         private HubConnection? _gameHubConnection;
         private IServiceScopeFactory _serviceScopeFactory;
         private Timer? _timer = null;
 
-        public GameHostedService(IServiceScopeFactory serviceScopeFactory)
+        public GameHostedService(IServiceScopeFactory serviceScopeFactory, IHostApplicationLifetime hostApplicationLifetime, IServer server)
         {
+            _server = server;
+            _hostApplicationLifetime = hostApplicationLifetime;
             _serviceScopeFactory = serviceScopeFactory;
         }
 
@@ -22,8 +28,12 @@ namespace AiCatchGame.Web.HostedServices
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            _timer = new Timer(DoWork, null, TimeSpan.Zero,
-            TimeSpan.FromSeconds(5));
+            _hostApplicationLifetime.ApplicationStarted.Register(() =>
+            {
+                _gameHubConnection = InitializeGameHubConnection();
+                _timer = new Timer(DoWork, null, TimeSpan.Zero,
+                  TimeSpan.FromSeconds(5));
+            });
 
             return Task.CompletedTask;
         }
@@ -37,22 +47,35 @@ namespace AiCatchGame.Web.HostedServices
 
         private async void DoWork(object? state)
         {
-            _gameHubConnection = InitializeGameHubConnection();
             using IServiceScope scope = _serviceScopeFactory.CreateScope();
             IGameService gameService = scope.ServiceProvider.GetRequiredService<IGameService>();
             await TreatGamesInLobby(gameService);
         }
 
+        private string GetDefaultAddres()
+        {
+            IServerAddressesFeature? serverAdressFeature = _server.Features.Get<IServerAddressesFeature>();
+
+            ArgumentNullException.ThrowIfNull(serverAdressFeature);
+            ICollection<string> addresses = serverAdressFeature.Addresses;
+            return addresses.First();
+        }
+
         private HubConnection InitializeGameHubConnection()
         {
+            string baseUrl = GetDefaultAddres();
             HubConnection gameHubConnection = new HubConnectionBuilder()
-                  .WithUrl("/api/gamehub").Build();
+                  .WithUrl($"{baseUrl}/gameHub").Build();
             return gameHubConnection;
         }
 
         private async Task TreatGamesInLobby(IGameService gameService)
         {
             ArgumentNullException.ThrowIfNull(_gameHubConnection);
+            if (_gameHubConnection.State != HubConnectionState.Connected)
+            {
+                await _gameHubConnection.StartAsync();
+            }
             GameServer[] games = await gameService.GetGamesToStart();
             foreach (GameServer game in games)
             {

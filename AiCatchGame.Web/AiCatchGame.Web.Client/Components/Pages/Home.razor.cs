@@ -22,7 +22,6 @@ namespace AiCatchGame.Web.Client.Components.Pages
         public async Task SubmitPlayer()
         {
             ArgumentNullException.ThrowIfNull(JsRuntime);
-
             ArgumentNullException.ThrowIfNull(NavigationManager);
             ArgumentNullException.ThrowIfNull(PlayerService);
 

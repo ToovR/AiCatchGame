@@ -1,5 +1,6 @@
 using AiCatchGame.Web.Api;
 using AiCatchGame.Web.Components;
+using AiCatchGame.Web.HostedServices;
 using AiCatchGame.Web.Interfaces;
 using AiCatchGame.Web.Services;
 using MudBlazor.Services;
@@ -18,7 +19,7 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddScoped<IGameService, GameService>();
 builder.Services.AddScoped<IChatService, ChatService>();
-
+builder.Services.AddHostedService<GameHostedService>();
 var app = builder.Build();
 
 app.MapHub<GameHub>("/gameHub");

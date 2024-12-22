@@ -4,7 +4,7 @@ namespace AiCatchGame.Web.Interfaces
 {
     public interface IGameService
     {
-        Task<Guid> AddPlayerToGame(string pseudonym, string privateId);
+        Task<Tuple<Guid, GameServer>> AddPlayerToGame(string pseudonym, String privateId);
 
         Task<Guid> GetCharacterId(string playerId);
 
@@ -15,6 +15,8 @@ namespace AiCatchGame.Web.Interfaces
         IEnumerable<GameServer> GetGames();
 
         Task<GameServer[]> GetGamesToStart();
+
+        Task<GameSetServer> InitializeSetInfo(Guid gameId);
 
         Task StartGame(Guid id);
     }

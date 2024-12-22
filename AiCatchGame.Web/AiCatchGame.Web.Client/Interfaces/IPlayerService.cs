@@ -15,13 +15,15 @@ namespace AiCatchGame.Web.Client.Interfaces
 
         void OnGameStart(Action<GameClient> gameAction);
 
+        void OnNewPlayer(Action<string> onNewPlayer);
+
         void OnReceivedMessage(Action<Guid, string> receivedMessageAction);
 
         Task OnSetEnd(Func<GameSetResultInfo, PlayerGameSetResultInfo, Task> setEndAction);
 
         void OnSetSomeoneVoted(Action<SomeoneVotedInfo> someoneVotedAction);
 
-        void OnSetStart(Action<GameSetInfo> setStartAction);
+        void OnSetStart(Action<GameSetClient> setStartAction);
 
         void OnSetStartChat(Action<GameSetChattingInfo> setStartChatAction);
 

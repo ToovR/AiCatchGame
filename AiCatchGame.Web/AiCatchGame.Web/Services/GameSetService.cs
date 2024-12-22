@@ -4,7 +4,7 @@ using AiCatchGame.Web.Interfaces;
 
 namespace AiCatchGame.Web.Services
 {
-    public class GameSetService
+    public class GameSetService : IGameSetService
     {
         private readonly IGameService _game;
 
@@ -25,7 +25,7 @@ namespace AiCatchGame.Web.Services
 
         public Task EndChatPhase(Guid gameSetId)
         {
-            GameSet gameSet = GetGameSet(gameSetId);
+            GameSetServer gameSet = GetGameSet(gameSetId);
             gameSet.Status = GameSetStatuses.Voting;
             throw new NotImplementedException();
             // TODO Notify vote
@@ -41,16 +41,16 @@ namespace AiCatchGame.Web.Services
             // TODO Notify vote
         }
 
-        public GameSet GetGameSet(Guid id)
+        public GameSetServer GetGameSet(Guid id)
         {
             IEnumerable<GameServer> games = _game.GetGames();
             return games.SelectMany(g => g.GameSets).Single(gs => gs.Id == id);
         }
 
-        public Task InitializeSet(GameServer game)
+        public Task<GameSetServer> InitializeSet(GameServer game)
         {
             int roundNumber = (game.GameSets.MaxOrDefault(s => s.RoundNumber) ?? 0) + 1;
-            GameSet newGameSet = new(roundNumber, Guid.NewGuid());
+            GameSetServer newGameSet = new(roundNumber, Guid.NewGuid());
             game.GameSets.Add(newGameSet);
             List<Player> remainingPlayers = game.HumanPlayers.Cast<Player>().Concat(game.AiPlayers.Cast<Player>()).Where(p => p.Status != PlayerStatuses.Lost).ToList();
 
@@ -66,9 +66,9 @@ namespace AiCatchGame.Web.Services
             });
 
             newGameSet.Status = GameSetStatuses.Chatting;
-            throw new NotImplementedException();
             // TODO Initialize Timer of chat
             // TODO Notify set start
+            return null;
         }
     }
 }

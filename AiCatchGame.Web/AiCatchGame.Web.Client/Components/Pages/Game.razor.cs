@@ -9,12 +9,13 @@ namespace AiCatchGame.Web.Client.Components.Pages
     {
         private Dictionary<Guid, string>? _characters;
         private CharacterInfo? _currentCharacter;
+        private List<string> _lobbyMessages = [];
         private string _message = "";
         private List<string> _messages = [];
         private CharacterInfo[]? _otherCharacters;
         private PlayerGameSetResultInfo? _playerResultInfo;
         private GameSetResultInfo? _setResult;
-        public GameSet? CurrentSet { get; set; }
+        public GameSetClient? CurrentSet { get; set; }
         public Guid? GameId { get; set; }
         public Guid? PlayerId { get; set; }
         private AiCatchGame.Bo.GameClient? GameData { get; set; }
@@ -84,22 +85,31 @@ namespace AiCatchGame.Web.Client.Components.Pages
         {
             ArgumentNullException.ThrowIfNull(PlayerService);
             GameData = new GameClient(GameStatuses.InLobby);
-            PlayerService.OnGameStart((Bo.GameClient data) => GameData = data);
-            PlayerService.OnSetStart(async (GameSetInfo gameSet) => await InitializeSet(gameSet));
+            PlayerService.OnGameStart((Bo.GameClient data) =>
+            {
+                GameData = data;
+                this.StateHasChanged();
+            });
+            PlayerService.OnSetStart(async (GameSetClient gameSet) => await InitializeSet(gameSet));
             PlayerService.OnSetStartChat(async (GameSetChattingInfo chatInfo) => await InitializeChat(chatInfo));
             PlayerService.OnSetStartVote(async (GameSetVotingInfo voteInfo) => await InitializeVote(voteInfo));
             await PlayerService.OnSetEnd(InitializeSetEnd);
             PlayerService.OnSetSomeoneVoted(async (SomeoneVotedInfo someoneVotedInfo) => await OnSomeoneVoted(someoneVotedInfo));
             PlayerService.OnReceivedMessage(async (Guid characterId, string message) => await AddMessage(characterId, message));
+            PlayerService.OnNewPlayer(async (string pseudonym) =>
+            {
+                _lobbyMessages.Add($"{pseudonym} s'est joint à la partie.");
+                this.StateHasChanged();
+            });
 
             await PlayerService.NotifyReady();
         }
 
-        private async Task InitializeSet(GameSetInfo gameSet)
+        private async Task InitializeSet(GameSetClient gameSet)
         {
             ArgumentNullException.ThrowIfNull(PlayerService);
-            CurrentSet = new GameSet(gameSet.RoundNumber, gameSet.Id);
-            _currentCharacter = await PlayerService.GetCharacterInfo(gameSet.Id);
+            CurrentSet = gameSet;
+            _currentCharacter = new(gameSet.PlayerSetInfo.CharacterId, gameSet.PlayerSetInfo.CharacterName);
             _characters = gameSet.Characters.ToDictionary(c => c.Id, c => c.Name);
             TimerRemaining = 10;
             CurrentSet.Status = GameSetStatuses.CharacterAttribution;

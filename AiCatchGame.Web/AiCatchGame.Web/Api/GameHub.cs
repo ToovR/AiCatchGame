@@ -16,8 +16,9 @@ namespace AiCatchGame.Web.Api
         public async Task JoinGame(string pseudonym)
         {
             string privateId = Context.ConnectionId;
-            Guid publicId = await _gameService.AddPlayerToGame(pseudonym, privateId);
+            (Guid publicId, GameServer game) = await _gameService.AddPlayerToGame(pseudonym, privateId);
             await Clients.Caller.SendAsync("GameJoined", privateId, publicId);
+            await GameClients(game).SendAsync("OnNewPlayer", pseudonym);
         }
 
         public override async Task OnConnectedAsync()
@@ -40,11 +41,6 @@ namespace AiCatchGame.Web.Api
             throw new NotImplementedException();
         }
 
-        public Task OnSetStart(Action<GameSetInfo> setStartAction)
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task OnSetStartChat(Action<GameSetChattingInfo> setStartChatAction)
         {
             await Clients.All.SendAsync("SetStartChat", (GameSetChattingInfo gameSetChatingInfo) => setStartChatAction(gameSetChatingInfo));
@@ -60,7 +56,7 @@ namespace AiCatchGame.Web.Api
             GameServer game = await _gameService.GetGameByPlayerId(playerId);
             Guid characterId = await _gameService.GetCharacterId(playerId);
 
-            await Clients.Users(game.HumanPlayers.Select(p => p.PrivateId)).SendAsync("ReceiveMessage", characterId, message);
+            await GameClients(game).SendAsync("ReceiveMessage", characterId, message);
         }
 
         public async Task SendPlayerReady(Guid player)
@@ -72,13 +68,26 @@ namespace AiCatchGame.Web.Api
         {
             GameServer game = await _gameService.GetGameById(gameId);
             await _gameService.StartGame(game.Id);
-            GameClient gameClient = new GameClient(GameStatuses.Playing);
-            await Clients.Users(game.PlayerIds).SendAsync("StartGame", gameClient);
+            GameClient gameClient = new(GameStatuses.Playing);
+            await GameClients(game).SendAsync("GameStarted", gameClient);
+            // Initialize first set
+            GameSetServer setinfo = await _gameService.InitializeSetInfo(game.Id);
+            CharacterInfo[] characterList = setinfo.PlayerSetInfoList.Select(p => new CharacterInfo(p.CharacterId, p.CharacterName)).ToArray();
+            foreach (PlayerSetInfo playerInfo in setinfo.PlayerSetInfoList)
+            {
+                GameSetClient gameSetClient = new(playerInfo, characterList, setinfo.RoundNumber, setinfo.Status);
+                await Clients.Clients(playerInfo.PlayerPrivateId).SendAsync("SetStarted", gameSetClient);
+            }
         }
 
         public Task Vote(string playerId, Guid characterId)
         {
             throw new NotImplementedException();
+        }
+
+        private IClientProxy GameClients(GameServer game)
+        {
+            return Clients.Clients(game.PlayerPrivateIds);
         }
     }
 }

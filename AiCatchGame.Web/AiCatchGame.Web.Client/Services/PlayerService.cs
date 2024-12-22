@@ -2,21 +2,19 @@ using AiCatchGame.Bo;
 using AiCatchGame.Bo.Exceptions;
 using AiCatchGame.Web.Client.Interfaces;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.SignalR.Client;
 
 namespace AiCatchGame.Web.Client.Services
 {
     public class PlayerService : IPlayerService
     {
+        private readonly IHubClientService _hubClientService;
         private readonly IStorageService _localStorage;
         private readonly NavigationManager _navigation;
         private readonly INetClient _netClient;
-        private HubConnection? _gameHubConnection = null;
 
-        public PlayerService(NavigationManager Navigation, IStorageService localStorage, INetClient netClient, NavigationManager navigation)
+        public PlayerService(NavigationManager Navigation, IStorageService localStorage, INetClient netClient, IHubClientService hubClientService)
         {
-            _gameHubConnection = new HubConnectionBuilder().WithUrl(Navigation.ToAbsoluteUri("/gameHub")).Build();
-            _navigation = navigation;
+            _hubClientService = hubClientService;
             _netClient = netClient;
             _localStorage = localStorage;
         }
@@ -25,9 +23,11 @@ namespace AiCatchGame.Web.Client.Services
         {
             try
             {
-                ArgumentNullException.ThrowIfNull(_gameHubConnection);
+                await _localStorage.Remove(LocalStorageKeys.PlayerPrivateId);
+                await _localStorage.Remove(LocalStorageKeys.PlayerPublicId);
+                ArgumentNullException.ThrowIfNull(_hubClientService);
 
-                _gameHubConnection.On<string, Guid>("GameJoined", async (privateId, publicId) =>
+                _hubClientService.OnGameJoined(async (privateId, publicId) =>
                 {
                     PlayerKeyInfo? playerId = new PlayerKeyInfo(privateId, publicId);
                     ArgumentNullException.ThrowIfNull(playerId);
@@ -35,8 +35,7 @@ namespace AiCatchGame.Web.Client.Services
                     await _localStorage.Set(LocalStorageKeys.PlayerPublicId, playerId.PublicId);
                 });
 
-                await _gameHubConnection.StartAsync();
-                await _gameHubConnection.SendAsync("JoinGame", pseudonym);
+                await _hubClientService.StartJoinGame(pseudonym);
 
                 string? playerId;
 
@@ -63,6 +62,11 @@ namespace AiCatchGame.Web.Client.Services
             }
         }
 
+        /// <summary>
+        /// TODO check if used
+        /// </summary>
+        /// <param name="setId"></param>
+        /// <returns></returns>
         public async Task<CharacterInfo> GetCharacterInfo(Guid setId)
         {
             string? playerPrivateId = await _localStorage.Get<string>(LocalStorageKeys.PlayerPrivateId);
@@ -85,92 +89,99 @@ namespace AiCatchGame.Web.Client.Services
 
         public async Task NotifyReady()
         {
-            ArgumentNullException.ThrowIfNull(_gameHubConnection);
+            ArgumentNullException.ThrowIfNull(_hubClientService);
             string? playerId = await _localStorage.Get<string>(LocalStorageKeys.PlayerPrivateId);
             ArgumentNullException.ThrowIfNull(playerId);
-            await _gameHubConnection.SendAsync("SendPlayerReady", playerId);
+            await _hubClientService.SendPlayerReady(playerId);
         }
 
         public void OnGameStart(Action<GameClient> gameAction)
         {
-            _gameHubConnection ??= InitializeGameHubConnection();
-            ArgumentNullException.ThrowIfNull(_gameHubConnection);
-            _gameHubConnection.On<GameClient>("GameStart", (GameClient game) => gameAction(game));
+            ArgumentNullException.ThrowIfNull(_hubClientService);
+            _hubClientService.OnGameStart(gameAction);
+        }
+
+        public void OnNewPlayer(Action<string> onNewPlayer)
+        {
+            ArgumentNullException.ThrowIfNull(_hubClientService);
+            _hubClientService.OnNewPlayer(onNewPlayer);
         }
 
         public void OnReceivedMessage(Action<Guid, string> receivedMessageAction)
         {
-            _gameHubConnection ??= InitializeGameHubConnection();
-            ArgumentNullException.ThrowIfNull(_gameHubConnection);
-            _gameHubConnection.On<Guid, string>("ReceivedMessage", (Guid characterId, string message) => receivedMessageAction(characterId, message));
+            ArgumentNullException.ThrowIfNull(_hubClientService);
+            _hubClientService.OnReceivedMessage(receivedMessageAction);
         }
 
         public async Task OnSetEnd(Func<GameSetResultInfo, PlayerGameSetResultInfo, Task> setEndAction)
         {
-            Guid? playerPublicId = await _localStorage.Get<Guid>(LocalStorageKeys.PlayerPublicId);
-            ArgumentNullException.ThrowIfNull(playerPublicId);
+            //Guid? playerPublicId = await _localStorage.Get<Guid>(LocalStorageKeys.PlayerPublicId);
+            //ArgumentNullException.ThrowIfNull(playerPublicId);
 
-            _gameHubConnection ??= InitializeGameHubConnection();
-            ArgumentNullException.ThrowIfNull(_gameHubConnection);
-            _gameHubConnection.On<GameSetResultInfo>("SetEnd", async (GameSetResultInfo gameSetResultInfo) =>
-            {
-                PlayerGameSetResultInfo playerInfo = gameSetResultInfo.Players.Single(p => p.PlayerId == playerPublicId);
-                await setEndAction(gameSetResultInfo, playerInfo);
-            });
+            //_gameHubConnection ??= InitializeGameHubConnection();
+            //ArgumentNullException.ThrowIfNull(_gameHubConnection);
+            //_gameHubConnection.On<GameSetResultInfo>("SetEnd", async (GameSetResultInfo gameSetResultInfo) =>
+            //{
+            //    PlayerGameSetResultInfo playerInfo = gameSetResultInfo.Players.Single(p => p.PlayerId == playerPublicId);
+            //    await setEndAction(gameSetResultInfo, playerInfo);
+            //});
         }
 
         public void OnSetSomeoneVoted(Action<SomeoneVotedInfo> someoneVotedAction)
         {
-            _gameHubConnection ??= InitializeGameHubConnection();
-            ArgumentNullException.ThrowIfNull(_gameHubConnection);
-            _gameHubConnection.On<SomeoneVotedInfo>("SetSomeoneVoted", (SomeoneVotedInfo someoneVotedInfo) => someoneVotedAction(someoneVotedInfo));
+            //_gameHubConnection ??= InitializeGameHubConnection();
+            //ArgumentNullException.ThrowIfNull(_gameHubConnection);
+            //_gameHubConnection.On<SomeoneVotedInfo>("SetSomeoneVoted", (SomeoneVotedInfo someoneVotedInfo) => someoneVotedAction(someoneVotedInfo));
         }
 
-        public void OnSetStart(Action<GameSetInfo> setStartAction)
+        public void OnSetStart(Action<GameSetClient> setStartAction)
         {
-            _gameHubConnection ??= InitializeGameHubConnection();
-            ArgumentNullException.ThrowIfNull(_gameHubConnection);
-            _gameHubConnection.On<GameSetInfo>("SetStart", (GameSetInfo gameSetInfo) => setStartAction(gameSetInfo));
+            ArgumentNullException.ThrowIfNull(_hubClientService);
+            _hubClientService.OnSetStart(setStartAction);
+
+            //_gameHubConnection ??= InitializeGameHubConnection();
+            //ArgumentNullException.ThrowIfNull(_gameHubConnection);
+            //_gameHubConnection.On<GameSetInfo>("SetStart", (GameSetInfo gameSetInfo) => setStartAction(gameSetInfo));
         }
 
         public void OnSetStartChat(Action<GameSetChattingInfo> setStartChatAction)
         {
-            _gameHubConnection ??= InitializeGameHubConnection();
-            ArgumentNullException.ThrowIfNull(_gameHubConnection);
-            _gameHubConnection.On<GameSetChattingInfo>("SetStartChat", (GameSetChattingInfo gameSetChatingInfo) => setStartChatAction(gameSetChatingInfo));
+            //_gameHubConnection ??= InitializeGameHubConnection();
+            //ArgumentNullException.ThrowIfNull(_gameHubConnection);
+            //_gameHubConnection.On<GameSetChattingInfo>("SetStartChat", (GameSetChattingInfo gameSetChatingInfo) => setStartChatAction(gameSetChatingInfo));
         }
 
         public void OnSetStartVote(Action<GameSetVotingInfo> setStartVoteAction)
         {
-            _gameHubConnection ??= InitializeGameHubConnection();
-            ArgumentNullException.ThrowIfNull(_gameHubConnection);
-            _gameHubConnection.On<GameSetVotingInfo>("SetStartVote", (GameSetVotingInfo gameSetVotingInfo) => setStartVoteAction(gameSetVotingInfo));
+            //_gameHubConnection ??= InitializeGameHubConnection();
+            //ArgumentNullException.ThrowIfNull(_gameHubConnection);
+            //_gameHubConnection.On<GameSetVotingInfo>("SetStartVote", (GameSetVotingInfo gameSetVotingInfo) => setStartVoteAction(gameSetVotingInfo));
         }
 
         public async Task SendMessage(string message)
         {
-            _gameHubConnection ??= InitializeGameHubConnection();
-            ArgumentNullException.ThrowIfNull(_gameHubConnection);
-            string? playerId = await _localStorage.Get<string>(LocalStorageKeys.PlayerPrivateId);
-            ArgumentNullException.ThrowIfNull(playerId);
-            await _gameHubConnection.SendAsync("SendMessage", playerId, message);
+            //_gameHubConnection ??= InitializeGameHubConnection();
+            //ArgumentNullException.ThrowIfNull(_gameHubConnection);
+            //string? playerId = await _localStorage.Get<string>(LocalStorageKeys.PlayerPrivateId);
+            //ArgumentNullException.ThrowIfNull(playerId);
+            //await _gameHubConnection.SendAsync("SendMessage", playerId, message);
         }
 
         public async Task Vote(Guid characterVotedId)
         {
-            _gameHubConnection ??= InitializeGameHubConnection();
-            ArgumentNullException.ThrowIfNull(_gameHubConnection);
-            string? playerId = await _localStorage.Get<string>(LocalStorageKeys.PlayerPrivateId);
-            await _gameHubConnection.SendAsync("Vote", playerId, characterVotedId);
+            //_gameHubConnection ??= InitializeGameHubConnection();
+            //ArgumentNullException.ThrowIfNull(_gameHubConnection);
+            //string? playerId = await _localStorage.Get<string>(LocalStorageKeys.PlayerPrivateId);
+            //await _gameHubConnection.SendAsync("Vote", playerId, characterVotedId);
         }
 
-        private HubConnection InitializeGameHubConnection()
-        {
-            HubConnection gameHubConnection = new HubConnectionBuilder()
-    .WithUrl(new Uri("/api/gamehub"))
-    .WithAutomaticReconnect()
-    .Build();
-            return gameHubConnection;
-        }
+        //    private HubConnection InitializeGameHubConnection()
+        //    {
+        //        HubConnection gameHubConnection = new HubConnectionBuilder()
+        //.WithUrl(new Uri("/api/gamehub"))
+        //.WithAutomaticReconnect()
+        //.Build();
+        //        return gameHubConnection;
+        //    }
     }
 }

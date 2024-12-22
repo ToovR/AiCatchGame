@@ -9,6 +9,14 @@
 else if (GameData.Status == GameStatuses.InLobby)
 {
     <MudText>En attente des autres joueurs...</MudText>
+    {
+        <ul id="messagesList">
+            @foreach (string message in _lobbyMessages)
+            {
+                <li>@message</li>
+            }
+        </ul>
+    }
 }
 else if (GameData.Status == GameStatuses.Over)
 {
