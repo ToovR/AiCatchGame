@@ -81,7 +81,7 @@ namespace AiCatchGame.Web.Client.Services
             {
                 return null;
             }
-            Guid? gameId = await _netClient.GetAsync<Guid>($"api/game/id/{playerId}/");
+            Guid? gameId = await _netClient.GetAsync<Guid?>($"api/game/id/{playerId}/");
             return gameId;
         }
 
@@ -124,9 +124,6 @@ namespace AiCatchGame.Web.Client.Services
         {
             ArgumentNullException.ThrowIfNull(_hubClientService);
             await _hubClientService.OnSetStart(setStartAction);
-            //_gameHubConnection ??= InitializeGameHubConnection();
-            //ArgumentNullException.ThrowIfNull(_gameHubConnection);
-            //_gameHubConnection.On<GameSetInfo>("SetStart", (GameSetInfo gameSetInfo) => setStartAction(gameSetInfo));
         }
 
         public Task OnSetStartChat(Func<GameSetChattingInfo, Task> setStartChatAction)
@@ -160,14 +157,11 @@ namespace AiCatchGame.Web.Client.Services
             //});
         }
 
-        public Task SendMessage(string message)
+        public async Task SendMessage(string message)
         {
-            //_gameHubConnection ??= InitializeGameHubConnection();
-            //ArgumentNullException.ThrowIfNull(_gameHubConnection);
-            //string? playerId = await _localStorage.Get<string>(LocalStorageKeys.PlayerPrivateId);
-            //ArgumentNullException.ThrowIfNull(playerId);
-            //await _gameHubConnection.SendAsync("SendMessage", playerId, message);
-            return Task.CompletedTask;
+            string? playerId = await _localStorage.Get<string>(LocalStorageKeys.PlayerPrivateId);
+            ArgumentNullException.ThrowIfNull(playerId);
+            await _hubClientService.SendMessage(playerId, message);
         }
 
         public async Task Vote(Guid characterVotedId)
@@ -177,14 +171,5 @@ namespace AiCatchGame.Web.Client.Services
             ArgumentNullException.ThrowIfNull(playerId);
             await _hubClientService.Vote(playerId, characterVotedId);
         }
-
-        //    private HubConnection InitializeGameHubConnection()
-        //    {
-        //        HubConnection gameHubConnection = new HubConnectionBuilder()
-        //.WithUrl(new Uri("/api/gamehub"))
-        //.WithAutomaticReconnect()
-        //.Build();
-        //        return gameHubConnection;
-        //    }
     }
 }

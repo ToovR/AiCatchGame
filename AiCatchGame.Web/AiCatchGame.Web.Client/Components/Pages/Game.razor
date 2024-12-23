@@ -35,11 +35,11 @@ else @* if (Game.Status == GameStatus.Playing) *@
         {
             <MudText Typo="Typo.h3">Votre nom pour ce tour est @_currentCharacter.Name</MudText>
             <MudText>Le tour commence dans</MudText>
-            <GameTimer @bind-Value="TimerRemaining" />
+            <GameTimer @bind-Value="@TimerRemaining" />
         }
         @if (CurrentSet.Status == GameSetStatuses.Chatting && TimerRemaining > 0)
         {
-            <GameTimer @bind-Value="TimerRemaining" />
+            <GameTimer @bind-Value="@TimerRemaining" />
 
             <ul id="messagesList">
                 @foreach (string message in _messages)

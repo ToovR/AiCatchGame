@@ -8,6 +8,9 @@ namespace AiCatchGame.Bo
             Name = characterName;
         }
 
+        public CharacterInfo()
+        { }
+        
         public Guid Id { get; set; }
         public string Name { get; set; }
     }

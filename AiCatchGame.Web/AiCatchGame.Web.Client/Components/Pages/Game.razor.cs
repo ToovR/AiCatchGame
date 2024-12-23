@@ -49,7 +49,7 @@ namespace AiCatchGame.Web.Client.Components.Pages
             Guid? gameId = await PlayerService.GetGameId();
             if (gameId == null)
             {
-                NavigationManager.NavigateTo("/home");
+                NavigationManager.NavigateTo("/");
             }
 
             await InitializeLobbyState();
@@ -114,6 +114,7 @@ namespace AiCatchGame.Web.Client.Components.Pages
             _characters = gameSet.Characters.ToDictionary(c => c.Id, c => c.Name);
             TimerRemaining = 10;
             CurrentSet.Status = GameSetStatuses.CharacterAttribution;
+            this.StateHasChanged();
             return Task.CompletedTask;
         }
 

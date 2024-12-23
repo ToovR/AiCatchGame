@@ -27,9 +27,13 @@ namespace AiCatchGame.Web.Services
             return new Tuple<Guid, GameServer>(humanPlayer.PublicId, game);
         }
 
-        public async Task<Guid> GetCharacterId(string playerId)
+        public async Task<Guid?> GetCharacterId(string playerId)
         {
-            GameServer game = await GetGameByPlayerId(playerId);
+            GameServer? game = await GetGameByPlayerId(playerId);
+            if (game == null)
+            {
+                return null;
+            }
             PlayerSetInfo? playerSetInfo = game.GameSets.Last().PlayerSetInfoList.FirstOrDefault(ps => ps.PlayerPrivateId == playerId);
             ArgumentNullException.ThrowIfNull(playerSetInfo);
             return playerSetInfo.CharacterId;
@@ -40,9 +44,9 @@ namespace AiCatchGame.Web.Services
             return Task.FromResult(_games.Single(g => g.Id == gameId));
         }
 
-        public Task<GameServer> GetGameByPlayerId(string playerId)
+        public Task<GameServer?> GetGameByPlayerId(string playerId)
         {
-            GameServer game = _games.First(g => g.PlayerPrivateIds.Any(p => playerId == p));
+            GameServer? game = _games.FirstOrDefault(g => g.PlayerPrivateIds.Any(p => playerId == p));
             return Task.FromResult(game);
         }
 

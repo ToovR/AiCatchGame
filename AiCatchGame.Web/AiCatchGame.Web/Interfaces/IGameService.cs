@@ -1,5 +1,4 @@
 ﻿using AiCatchGame.Bo;
-using AiCatchGame.Web.Client.Components.Pages;
 
 namespace AiCatchGame.Web.Interfaces
 {
@@ -7,11 +6,11 @@ namespace AiCatchGame.Web.Interfaces
     {
         Task<Tuple<Guid, GameServer>> AddPlayerToGame(string pseudonym, String privateId);
 
-        Task<Guid> GetCharacterId(string playerId);
+        Task<Guid?> GetCharacterId(string playerId);
 
         Task<GameServer> GetGameById(Guid gameId);
 
-        Task<GameServer> GetGameByPlayerId(string playerId);
+        Task<GameServer?> GetGameByPlayerId(string playerId);
 
         IEnumerable<GameServer> GetGames();
 

@@ -53,10 +53,19 @@ namespace AiCatchGame.Web.Api
 
         public async Task SendMessage(string playerId, string message)
         {
-            GameServer game = await _gameService.GetGameByPlayerId(playerId);
-            Guid characterId = await _gameService.GetCharacterId(playerId);
+            GameServer? game = await _gameService.GetGameByPlayerId(playerId);
+            if (game == null)
+            {
+                return;
+            }
 
-            await GamePlayers(game).SendAsync("ReceiveMessage", characterId, message);
+            Guid? characterId = await _gameService.GetCharacterId(playerId);
+            if (characterId == null)
+            {
+                return;
+            }
+
+            await GamePlayers(game).SendAsync("ReceivedMessage", characterId, message);
         }
 
         public async Task SendPlayerReady(Guid player)
@@ -95,7 +104,12 @@ namespace AiCatchGame.Web.Api
         public async Task Vote(string playerId, Guid characterVotedId)
         {
             DateTime timestampVote = DateTime.Now;
-            GameServer game = await _gameService.GetGameByPlayerId(playerId);
+            GameServer? game = await _gameService.GetGameByPlayerId(playerId);
+            if (game == null)
+            {
+                return;
+            }
+
             GameSetServer set = game.GameSets.Last();
             ArgumentNullException.ThrowIfNull(set.VotingStartTime);
             double timeReaction = (timestampVote - set.VotingStartTime.Value).TotalSeconds;
@@ -117,8 +131,20 @@ namespace AiCatchGame.Web.Api
             CharacterInfo[] characterList = setinfo.PlayerSetInfoList.Select(p => new CharacterInfo(p.CharacterId, p.CharacterName)).ToArray();
             foreach (PlayerSetInfo playerInfo in setinfo.PlayerSetInfoList)
             {
+                if (playerInfo.IsAi)
+                {
+                    continue;
+                }
                 GameSetClient gameSetClient = new(playerInfo, characterList, setinfo.RoundNumber, setinfo.Status);
-                await Clients.Clients(playerInfo.PlayerPrivateId).SendAsync("SetStarted", gameSetClient);
+                try
+                {
+                    await Clients.Clients(playerInfo.PlayerPrivateId).SendAsync("SetStarted", gameSetClient);
+                    //await Clients.Clients(playerInfo.PlayerPrivateId).SendAsync("SetStarted", JsonSerializer.Serialize(gameSetClient));
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
             }
         }
     }

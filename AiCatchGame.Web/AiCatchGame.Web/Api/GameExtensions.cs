@@ -1,3 +1,4 @@
+using AiCatchGame.Bo;
 using AiCatchGame.Web.Interfaces;
 
 namespace AiCatchGame.Web.Api
@@ -6,7 +7,15 @@ namespace AiCatchGame.Web.Api
     {
         public static RouteGroupBuilder MapGame(this RouteGroupBuilder group)
         {
-            group.MapGet("id/{playerId}", async (string playerId, IGameService gameService) => (await gameService.GetGameByPlayerId(playerId)).Id);
+            group.MapGet("id/{playerId}", async (string playerId, IGameService gameService) =>
+            {
+                GameServer? game = (await gameService.GetGameByPlayerId(playerId));
+                if (game == null)
+                {
+                    return (Guid?)null;
+                }
+                return game.Id;
+            });
             return group;
         }
     }

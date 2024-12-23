@@ -38,6 +38,7 @@ namespace AiCatchGame.Web.Client.Services
         public Task OnReceivedMessage(Func<Guid, string, Task> receivedMessageAction)
         {
             ArgumentNullException.ThrowIfNull(_gameHubConnection);
+
             _gameHubConnection.On("ReceivedMessage", receivedMessageAction);
             return Task.CompletedTask;
         }
@@ -52,7 +53,20 @@ namespace AiCatchGame.Web.Client.Services
         public Task OnSetStart(Func<GameSetClient, Task> setStartAction)
         {
             ArgumentNullException.ThrowIfNull(_gameHubConnection);
-            _gameHubConnection.On("SetStarted", setStartAction);
+            _gameHubConnection.On<GameSetClient>("SetStarted", async (gsc) => await setStartAction(gsc));
+            //_gameHubConnection.On<string>("SetStarted", async (gsc) =>
+            //{
+            //    try
+            //    {
+            //        GameSetClient? gameSetClient = JsonSerializer.Deserialize<GameSetClient>(gsc);
+            //        ArgumentNullException.ThrowIfNull(gameSetClient);
+            //        await setStartAction(gameSetClient);
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        throw ex;
+            //    }
+            //});
             return Task.CompletedTask;
         }
 
@@ -63,31 +77,36 @@ namespace AiCatchGame.Web.Client.Services
             return Task.CompletedTask;
         }
 
+        public async Task SendMessage(string playerId, string message)
+        {
+            await (await SafeSend()).SendAsync("SendMessage", playerId, message);
+        }
+
         public async Task SendPlayerReady(string playerId)
         {
-            ArgumentNullException.ThrowIfNull(_gameHubConnection);
-            if (_gameHubConnection.State != HubConnectionState.Connected)
-            {
-                await _gameHubConnection.StartAsync();
-            }
-            await _gameHubConnection.SendAsync("SendPlayerReady", playerId);
+            await (await SafeSend()).SendAsync("SendPlayerReady", playerId);
         }
 
         public async Task StartJoinGame(string pseudonym)
         {
-            ArgumentNullException.ThrowIfNull(_gameHubConnection);
-            await _gameHubConnection.StartAsync();
-            await _gameHubConnection.SendAsync("JoinGame", pseudonym);
+            await (await SafeSend()).SendAsync("JoinGame", pseudonym);
         }
 
         public async Task Vote(string playerId, Guid characterVotedId)
         {
             ArgumentNullException.ThrowIfNull(_gameHubConnection);
+            await (await SafeSend()).SendAsync("Vote", playerId, characterVotedId);
+        }
+
+        private async Task<HubConnection> SafeSend()
+        {
+            ArgumentNullException.ThrowIfNull(_gameHubConnection);
             if (_gameHubConnection.State != HubConnectionState.Connected)
             {
                 await _gameHubConnection.StartAsync();
+                Console.WriteLine($"connection id :{_gameHubConnection.ConnectionId}");
             }
-            await _gameHubConnection.SendAsync("Vote", playerId, characterVotedId);
+            return _gameHubConnection;
         }
     }
 }

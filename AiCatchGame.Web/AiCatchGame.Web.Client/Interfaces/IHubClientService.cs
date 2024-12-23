@@ -18,6 +18,8 @@ namespace AiCatchGame.Web.Client.Interfaces
 
         Task OnSetStartVote(Func<GameSetVotingInfo, Task> setStartVoteAction);
 
+        Task SendMessage(string playerId, string message);
+
         Task SendPlayerReady(string playerId);
 
         Task StartJoinGame(string pseudonym);

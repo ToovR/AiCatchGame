@@ -96,6 +96,7 @@ namespace AiCatchGame.Web.HostedServices
             foreach (GameServer game in games)
             {
                 await _gameHubConnection.SendAsync("SetEndVote", game.Id);
+                game.GameSets.Last().Status = GameSetStatuses.End;
             }
         }
 
