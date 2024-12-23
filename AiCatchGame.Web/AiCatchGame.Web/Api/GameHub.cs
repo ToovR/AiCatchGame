@@ -101,6 +101,20 @@ namespace AiCatchGame.Web.Api
             await GamePlayers(game).SendAsync("ShowScore", resultInfo);
         }
 
+        public async Task SetStartChat(Guid gameId)
+        {
+            GameServer game = await _gameService.GetGameById(gameId);
+            GameSetServer set = game.GameSets.Last();
+            set.Status = GameSetStatuses.Chatting;
+            foreach (PlayerSetInfo playerInfo in set.PlayerSetInfoList)
+            {
+                GameSetChattingInfo gameSetChattingInfo = new() { Duration = game.Rules.ChatDuration };
+
+                await Clients.Clients(playerInfo.PlayerPrivateId).SendAsync("OnSetStartChat", gameSetChattingInfo);
+            }
+            set.ChattingStartTime = DateTime.Now;
+        }
+
         public async Task Vote(string playerId, Guid characterVotedId)
         {
             DateTime timestampVote = DateTime.Now;
@@ -135,16 +149,8 @@ namespace AiCatchGame.Web.Api
                 {
                     continue;
                 }
-                GameSetClient gameSetClient = new(playerInfo, characterList, setinfo.RoundNumber, setinfo.Status);
-                try
-                {
-                    await Clients.Clients(playerInfo.PlayerPrivateId).SendAsync("SetStarted", gameSetClient);
-                    //await Clients.Clients(playerInfo.PlayerPrivateId).SendAsync("SetStarted", JsonSerializer.Serialize(gameSetClient));
-                }
-                catch (Exception ex)
-                {
-                    throw ex;
-                }
+                GameSetClient gameSetClient = new(playerInfo, characterList, setinfo.RoundNumber, setinfo.Status, game.Rules.CharacterAttributionDuration);
+                await Clients.Clients(playerInfo.PlayerPrivateId).SendAsync("SetStarted", gameSetClient);
             }
         }
     }

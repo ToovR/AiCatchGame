@@ -16,6 +16,8 @@ namespace AiCatchGame.Web.Interfaces
 
         Task<GameServer[]> GetGamesToStart();
 
+        Task<GameServer[]> GetGamesToStartChat();
+
         Task<GameServer[]> GetGamesToStopChat();
 
         Task<GameServer[]> GetGamesToStopVote();

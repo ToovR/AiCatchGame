@@ -126,12 +126,9 @@ namespace AiCatchGame.Web.Client.Services
             await _hubClientService.OnSetStart(setStartAction);
         }
 
-        public Task OnSetStartChat(Func<GameSetChattingInfo, Task> setStartChatAction)
+        public async Task OnSetStartChat(Func<GameSetChattingInfo, Task> setStartChatAction)
         {
-            //_gameHubConnection ??= InitializeGameHubConnection();
-            //ArgumentNullException.ThrowIfNull(_gameHubConnection);
-            //_gameHubConnection.On<GameSetChattingInfo>("SetStartChat", (GameSetChattingInfo gameSetChatingInfo) => setStartChatAction(gameSetChatingInfo));
-            return Task.CompletedTask;
+            await _hubClientService.OnSetStartChat(setStartChatAction);
         }
 
         public async Task OnSetStartVote(Func<GameSetVotingInfo, Task> setStartVoteAction)
@@ -144,17 +141,6 @@ namespace AiCatchGame.Web.Client.Services
         {
             ArgumentNullException.ThrowIfNull(_hubClientService);
             await _hubClientService.OnSetShowScore(setShowScoreAction);
-
-            //Guid? playerPublicId = await _localStorage.Get<Guid>(LocalStorageKeys.PlayerPublicId);
-            //ArgumentNullException.ThrowIfNull(playerPublicId);
-
-            //_gameHubConnection ??= InitializeGameHubConnection();
-            //ArgumentNullException.ThrowIfNull(_gameHubConnection);
-            //_gameHubConnection.On<GameSetResultInfo>("SetEnd", async (GameSetResultInfo gameSetResultInfo) =>
-            //{
-            //    PlayerGameSetResultInfo playerInfo = gameSetResultInfo.Players.Single(p => p.PlayerId == playerPublicId);
-            //    await setEndAction(gameSetResultInfo, playerInfo);
-            //});
         }
 
         public async Task SendMessage(string message)

@@ -1,5 +1,6 @@
 ﻿using AiCatchGame.Bo;
 using AiCatchGame.Web.Interfaces;
+using AiCatchGame.Web.Services;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -50,6 +51,7 @@ namespace AiCatchGame.Web.HostedServices
             using IServiceScope scope = _serviceScopeFactory.CreateScope();
             IGameService gameService = scope.ServiceProvider.GetRequiredService<IGameService>();
             await TreatGamesInLobby(gameService);
+            await TreatGameSetChatToStart(gameService);
             await TreatGameSetChatToStop(gameService);
             await TreatGameSetVoteToStop(gameService);
         }
@@ -69,6 +71,20 @@ namespace AiCatchGame.Web.HostedServices
             HubConnection gameHubConnection = new HubConnectionBuilder()
                   .WithUrl($"{baseUrl}/gameHub").Build();
             return gameHubConnection;
+        }
+
+        private async Task TreatGameSetChatToStart(IGameService gameService)
+        {
+            ArgumentNullException.ThrowIfNull(_gameHubConnection);
+            if (_gameHubConnection.State != HubConnectionState.Connected)
+            {
+                await _gameHubConnection.StartAsync();
+            }
+            GameServer[] games = await gameService.GetGamesToStartChat();
+            foreach (GameServer game in games)
+            {
+                await _gameHubConnection.SendAsync("SetStartChat", game.Id);
+            }
         }
 
         private async Task TreatGameSetChatToStop(IGameService gameService)

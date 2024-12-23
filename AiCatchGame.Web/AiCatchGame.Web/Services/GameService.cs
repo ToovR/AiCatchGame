@@ -66,6 +66,14 @@ namespace AiCatchGame.Web.Services
             return Task.FromResult(gamesToStart);
         }
 
+        public Task<GameServer[]> GetGamesToStartChat()
+        {
+            GameServer[] gamesToStartChat = _games.Where(g => g.Status == GameStatuses.Playing &&
+                                g.GameSets.Any() && g.GameSets.Last().Status == GameSetStatuses.CharacterAttribution && g.GameSets.Last().CharacterAttributionStartTime.HasValue &&
+                                DateTime.Now > g.GameSets.Last().CharacterAttributionStartTime!.Value.AddSeconds(g.Rules.CharacterAttributionDuration)).ToArray();
+            return Task.FromResult(gamesToStartChat);
+        }
+
         public Task<GameServer[]> GetGamesToStopChat()
         {
             GameServer[] gamesToStopChat = _games.Where(g => g.Status == GameStatuses.Playing &&

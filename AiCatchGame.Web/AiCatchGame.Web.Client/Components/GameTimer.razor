@@ -3,7 +3,7 @@
     [Parameter] public int Value { get; set; }
     [Parameter] public EventCallback<int> ValueChanged { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    protected override Task OnInitializedAsync()
     {
         System.Threading.Timer timer = new System.Threading.Timer(async _ =>  // async void
         {
@@ -15,6 +15,6 @@
             // we need to Invoke it because we could be on the wrong Thread
             await InvokeAsync(StateHasChanged);
         }, null, 0, 1000);
-
+        return Task.CompletedTask;
     }
 }

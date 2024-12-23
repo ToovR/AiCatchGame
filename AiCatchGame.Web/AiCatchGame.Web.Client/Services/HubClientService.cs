@@ -54,19 +54,13 @@ namespace AiCatchGame.Web.Client.Services
         {
             ArgumentNullException.ThrowIfNull(_gameHubConnection);
             _gameHubConnection.On<GameSetClient>("SetStarted", async (gsc) => await setStartAction(gsc));
-            //_gameHubConnection.On<string>("SetStarted", async (gsc) =>
-            //{
-            //    try
-            //    {
-            //        GameSetClient? gameSetClient = JsonSerializer.Deserialize<GameSetClient>(gsc);
-            //        ArgumentNullException.ThrowIfNull(gameSetClient);
-            //        await setStartAction(gameSetClient);
-            //    }
-            //    catch (Exception ex)
-            //    {
-            //        throw ex;
-            //    }
-            //});
+            return Task.CompletedTask;
+        }
+
+        public Task OnSetStartChat(Func<GameSetChattingInfo, Task> setStartChatAction)
+        {
+            ArgumentNullException.ThrowIfNull(_gameHubConnection);
+            _gameHubConnection.On<GameSetChattingInfo>("OnSetStartChat", async (gsci) => await setStartChatAction(gsci));
             return Task.CompletedTask;
         }
 

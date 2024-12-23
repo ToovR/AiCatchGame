@@ -5,6 +5,11 @@
         /// <summary>
         /// Get or set chat time duration in seconds
         /// </summary>
+        public int CharacterAttributionDuration { get; set; }
+
+        /// <summary>
+        /// Get or set chat time duration in seconds
+        /// </summary>
         public int ChatDuration { get; set; }
 
         public int PlayerMax { get; set; }
@@ -23,6 +28,7 @@
         {
             return new GameRuleInfo()
             {
+                CharacterAttributionDuration = 10,
                 ChatDuration = 120,
                 PlayerMin = 2,
                 PlayerMax = 10,

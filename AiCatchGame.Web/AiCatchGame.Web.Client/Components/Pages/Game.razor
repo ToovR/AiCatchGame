@@ -50,8 +50,7 @@ else @* if (Game.Status == GameStatus.Playing) *@
 
             <div class="form-group">
                 <label>
-                    Message:
-                    <MudTextField Label="message" @bind-Value="_message" size="50" />
+                    <MudTextField Label="message" @bind-Value="_message" Immediate="true" OnKeyDown="OnChatKeyDown" size="50" />
                 </label>
             </div>
             <MudButton OnClick="SendMessage">Send</MudButton>

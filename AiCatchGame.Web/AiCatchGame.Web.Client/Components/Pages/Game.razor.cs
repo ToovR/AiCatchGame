@@ -1,7 +1,9 @@
 using AiCatchGame.Bo;
 using AiCatchGame.Web.Client.Interfaces;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using MudBlazor;
+using static MudBlazor.Colors;
 
 namespace AiCatchGame.Web.Client.Components.Pages
 {
@@ -77,6 +79,7 @@ namespace AiCatchGame.Web.Client.Components.Pages
             _messages = [];
             CurrentSet.Status = GameSetStatuses.Chatting;
             TimerRemaining = chatInfo.Duration;
+            this.StateHasChanged();
             return Task.CompletedTask;
         }
 
@@ -112,7 +115,7 @@ namespace AiCatchGame.Web.Client.Components.Pages
             CurrentSet = gameSet;
             _currentCharacter = new(gameSet.PlayerSetInfo.CharacterId, gameSet.PlayerSetInfo.CharacterName);
             _characters = gameSet.Characters.ToDictionary(c => c.Id, c => c.Name);
-            TimerRemaining = 10;
+            TimerRemaining = gameSet.CharacterAttributionDuration;
             CurrentSet.Status = GameSetStatuses.CharacterAttribution;
             this.StateHasChanged();
             return Task.CompletedTask;
@@ -138,6 +141,14 @@ namespace AiCatchGame.Web.Client.Components.Pages
             return Task.CompletedTask;
         }
 
+        private async void OnChatKeyDown(KeyboardEventArgs args)
+        {
+            if (args.Key == "Enter")
+            {
+                await SendMessage();
+            }
+        }
+
         private Task OnSomeoneVoted(SomeoneVotedInfo someoneVotedInfo)
         {
             _snackBar.Add($"{someoneVotedInfo.PlayerName} a voté", Severity.Info);
@@ -148,6 +159,7 @@ namespace AiCatchGame.Web.Client.Components.Pages
         {
             ArgumentNullException.ThrowIfNull(PlayerService);
             await PlayerService.SendMessage(_message);
+            _message = "";
         }
 
         private async Task VoteFor(Guid characterId)

@@ -65,8 +65,8 @@ namespace AiCatchGame.Web.Services
                 newGameSet.PlayerSetInfoList.Add(new PlayerSetInfo(p.PrivateId, characterName, Guid.NewGuid(), p is AiPlayer));
             });
 
-            newGameSet.Status = GameSetStatuses.Chatting;
-            newGameSet.ChattingStartTime = DateTime.Now;
+            newGameSet.Status = GameSetStatuses.CharacterAttribution;
+            newGameSet.CharacterAttributionStartTime = DateTime.Now;
             return Task.FromResult(newGameSet);
         }
     }

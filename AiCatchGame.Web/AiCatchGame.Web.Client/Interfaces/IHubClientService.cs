@@ -16,6 +16,8 @@ namespace AiCatchGame.Web.Client.Interfaces
 
         Task OnSetStart(Func<GameSetClient, Task> setStartAction);
 
+        Task OnSetStartChat(Func<GameSetChattingInfo, Task> setStartChatAction);
+
         Task OnSetStartVote(Func<GameSetVotingInfo, Task> setStartVoteAction);
 
         Task SendMessage(string playerId, string message);

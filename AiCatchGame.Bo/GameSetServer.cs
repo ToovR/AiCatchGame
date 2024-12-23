@@ -2,6 +2,7 @@ namespace AiCatchGame.Bo
 {
     public class GameSetServer(int roundNumber, Guid id)
     {
+        public DateTime? CharacterAttributionStartTime { get; set; }
         public DateTime? ChattingStartTime { get; set; } = null;
         public Guid Id { get; } = id;
         public List<PlayerSetInfo> PlayerSetInfoList { get; set; } = [];
