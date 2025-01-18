@@ -29,7 +29,7 @@
             return new GameRuleInfo()
             {
                 CharacterAttributionDuration = 10,
-                ChatDuration = 120,
+                ChatDuration = 20,
                 PlayerMin = 2,
                 PlayerMax = 10,
                 ScoreVotedFor = 400,

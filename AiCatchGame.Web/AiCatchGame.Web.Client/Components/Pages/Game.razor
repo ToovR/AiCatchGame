@@ -1,5 +1,6 @@
 @using AiCatchGame.Bo
 @using AiCatchGame.Web.Client.Components
+@using AiCatchGame.Web.Client.Components.Common
 @page "/game"
 
 @if (GameData == null)
@@ -50,7 +51,7 @@ else @* if (Game.Status == GameStatus.Playing) *@
 
             <div class="form-group">
                 <label>
-                    <MudTextField Label="message" @bind-Value="_message" Immediate="true" OnKeyDown="OnChatKeyDown" size="50" />
+                    <ACCTextField Label="message" @bind-Value="_message" OnEnter="SendMessage" />
                 </label>
             </div>
             <MudButton OnClick="SendMessage">Send</MudButton>
@@ -67,50 +68,8 @@ else @* if (Game.Status == GameStatus.Playing) *@
         else if (CurrentSet.Status == GameSetStatuses.End && _setResult != null)
         {
 
-
-            @foreach (AiGameSetResultInfo aiPlayer in _setResult.AiInfoList)
-            {
-                <MudText>L'IA était <span class="suspenseOpen">@aiPlayer.Character.Name</span></MudText>
-            }
-            @foreach (HumanPlayerGameSetResultInfo humanPlayer in _setResult.HumanPlayers)
-            {
-                <MudText>
-                    <span class="emph">@humanPlayer.Pseudonym</span> qui jouait <span class="emph">@GetCharacterNameById(humanPlayer.CharacterId)</span>
-                    @if (humanPlayer.VoteReaction == null)
-                    {
-                        <span>n'a pas voté</span>
-                    }
-                    else 
-                    {
-                        <span>a voté en </span><span class="emph">@humanPlayer.VoteReaction.Value.ToString()s</span>
-                       <span> pour </span><span class="@(humanPlayer.HasFoundAi ? "success" : "failure") emph"> @GetCharacterNameById(humanPlayer.CharacterId)</span>
-                    }
-
-                    <span class="point emph @(humanPlayer.ScoreVote > 0 ? "success" : "failure")">@humanPlayer.ScoreVote</span>
-                </MudText>
-                <MudText>
-                    <span class="emph @(humanPlayer.ScoreVote > 0 ? "success" : "failure")">
-                        @GetPlayersStringById(humanPlayer.PlayerIdsVotedFor)
-
-                    </span>
-                    @if (humanPlayer.PlayerIdsVotedFor.Length == 0)
-                    {
-                        <span>n'a</span>
-                    }
-                    else if (humanPlayer.PlayerIdsVotedFor.Length == 1)
-                    {
-                        <span>a</span>
-                    }
-                    else
-                    {
-                        <span>ont</span>
-                    }
-                    <span> voté pour </span><span class="emph">@_currentCharacter.Name</span>
-                    <span class="point emph @(humanPlayer.ScoreVotedAsAi > 0 ? "success" : "failure")">@humanPlayer.ScoreVotedAsAi</span>
-                </MudText>
-                <MudText>Ce qui fait <span class="point emph @(humanPlayer.ScoreSet > 0 ? "success" : "neg")">@humanPlayer.ScoreSet</span> points pour ce tour</MudText>
-                <MudText>Soit un total de <span class="point emph @(humanPlayer.ScoreTotal > 0 ? "success" : "failure")">@humanPlayer.ScoreTotal</span> points.</MudText>
-            }
+            <AiCatchGame.Web.Client.Components.GameScreen.SetEnd CurrentSet="@CurrentSet" SetResult="@_setResult" />
+       
         }
     }
 }

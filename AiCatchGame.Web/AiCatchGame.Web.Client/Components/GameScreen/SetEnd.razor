@@ -1,0 +1,53 @@
+﻿@using AiCatchGame.Bo
+<div>
+    @if (SetResult != null)
+    {
+        @foreach (AiGameSetResultInfo aiPlayer in SetResult.AiInfoList)
+        {
+            <MudText>L'IA était <span class="suspenseOpen">@aiPlayer.Character.Name</span></MudText>
+        }
+        @foreach (HumanPlayerGameSetResultInfo humanPlayer in SetResult.HumanPlayers)
+        {
+            <MudText>
+                <span class="emph">@humanPlayer.Pseudonym</span> qui jouait <span class="emph">@GetCharacterNameById(humanPlayer.CharacterId)</span>
+                @if (humanPlayer.VoteReaction == null)
+                {
+                    <span> n'a pas voté</span>
+                }
+                else
+                {
+                    <span> a voté en </span>
+
+                    <span class="emph">@humanPlayer.VoteReaction.Value.ToString()s</span>
+                    <span> pour </span>
+
+                    <span class="emph"> @GetCharacterNameById(humanPlayer.CharacterId)</span>
+                }
+                :
+                <span class="point emph @(humanPlayer.ScoreVote > 0 ? "success" : "failure")">@humanPlayer.ScoreVote</span> points.
+            </MudText>
+            <MudText>
+                <span class="emph">
+                    @GetPlayersStringById(humanPlayer.PlayerIdsVotedFor)
+
+                </span>
+                @if (humanPlayer.PlayerIdsVotedFor.Length == 0)
+                {
+                    <span> n'a</span>
+                }
+                else if (humanPlayer.PlayerIdsVotedFor.Length == 1)
+                {
+                    <span> a</span>
+                }
+                else
+                {
+                    <span> ont</span>
+                }
+                <span> voté pour </span><span class="emph">@_currentCharacter.Name</span> : <span class="point emph @(humanPlayer.ScoreVotedAsAi > 0 ? "success" : "failure")">@humanPlayer.ScoreVotedAsAi</span> points.
+            </MudText>
+            <MudText>Ce qui fait <span class="point emph @(humanPlayer.ScoreSet > 0 ? "success" : "neg")">@humanPlayer.ScoreSet</span> points pour ce tour</MudText>
+            <MudText>Soit un total de <span class="point emph @(humanPlayer.ScoreTotal > 0 ? "success" : "failure")">@humanPlayer.ScoreTotal</span> points.</MudText>
+        }
+    }
+
+</div>

@@ -24,3 +24,6 @@ Chaque joueur va en 10 secondes sélectionner celui qu'il pense être l'IA.
 
 
 
+
+
+

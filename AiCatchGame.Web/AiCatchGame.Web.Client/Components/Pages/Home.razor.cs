@@ -8,7 +8,7 @@ namespace AiCatchGame.Web.Client.Components.Pages
 {
     public partial class Home
     {
-        public string? PlayerPseudonym { get; set; }
+        public string? PlayerPseudonym { get; set; } = "";
 
         [Inject]
         public IPlayerService? PlayerService { get; set; }

@@ -1,4 +1,5 @@
 @page "/"
+@using AiCatchGame.Web.Client.Components.Common
 
 @* @page "/home"
  *@
@@ -7,7 +8,7 @@
 <h1>Catch the AI</h1>
 
 <p>
-    <MudTextField Label="Ton pseudo (invisible pendant la partie)" @bind-Value="@PlayerPseudonym" />
+    <ACCTextField Label="Ton pseudo (invisible pendant la partie)" @bind-Value="@PlayerPseudonym" OnEnter="SubmitPlayer" />
     <MudButton OnClick="SubmitPlayer">Let's gooooo !</MudButton>
 
 </p>
