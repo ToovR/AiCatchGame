@@ -5,11 +5,11 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 
 namespace AiCatchGame.Web.Services
 {
-    public class GameService(IActionContextAccessor context, IServiceScopeFactory serviceScopeFactory) : IGameService
+    public class GameService(IServiceScopeFactory serviceScopeFactory) : IGameService
     {
         private const int LOBBY_PLAYER_WAIING_SECONDS = 5;
         private static readonly List<GameServer> _games = [];
-        private readonly IActionContextAccessor _context = context;
+  //      private readonly IActionContextAccessor _context = context;
         private readonly IServiceScopeFactory _serviceScopeFactory = serviceScopeFactory;
 
         public async Task<Tuple<Guid, GameServer>> AddPlayerToGame(string pseudonym, String privateId)
@@ -112,10 +112,11 @@ namespace AiCatchGame.Web.Services
 
         public IEnumerable<AiPlayerClientService> InitializeAiPlayers(GameServer game)
         {
-            foreach (AiPlayer aiPlayer in game.AiPlayers)
-            {
-                yield return InitializeAiPlayer(game, aiPlayer);
-            }
+            return [];
+            //foreach (AiPlayer aiPlayer in game.AiPlayers)
+            //{
+            //    yield return InitializeAiPlayer(game, aiPlayer);
+            //}
         }
 
         public async Task<GameSetServer> InitializeSetInfo(Guid gameId)
@@ -186,10 +187,11 @@ namespace AiCatchGame.Web.Services
 
         private AiPlayerClientService InitializeAiPlayer(GameServer game, AiPlayer aiPlayer)
         {
-            string url = $"{this._context.ActionContext.HttpContext.Request.Scheme}://{this._context.ActionContext.HttpContext.Request.Host}:${this._context.ActionContext.HttpContext.Request.Protocol}/gameHub";
-            AiPlayerClientService newAIPlayerClientService = new AiPlayerClientService(aiPlayer, _serviceScopeFactory);
-            newAIPlayerClientService.InitializeClient(url, aiPlayer);
-            return newAIPlayerClientService;
+            return null;
+            //string url = $"{this._context.ActionContext.HttpContext.Request.Scheme}://{this._context.ActionContext.HttpContext.Request.Host}:${this._context.ActionContext.HttpContext.Request.Protocol}/gameHub";
+            //AiPlayerClientService newAIPlayerClientService = new AiPlayerClientService(aiPlayer, _serviceScopeFactory);
+            //newAIPlayerClientService.InitializeClient(url, aiPlayer);
+            //return newAIPlayerClientService;
         }
 
         private Task<GameServer> InitializeGame()

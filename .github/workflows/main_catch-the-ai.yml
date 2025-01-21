@@ -55,12 +55,18 @@ jobs:
         with:
           name: .net-app
 
-      - name: Deploy to Azure Web App
-        id: deploy-to-webapp
-        uses: azure/webapps-deploy@85270a1854658d167ab239bce43949edb336fa7c
+      - name: Login to Azure
+        uses: azure/login@v2
         with:
           client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_7A89D9E4044042DAAAEC0C34E8E65A14 }}
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_1D8FA58F6C0A46528D0A6D91878B5FFB }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_8A401AC39DF34E90BD58B28BDA9A78DC }}    
-
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_8A401AC39DF34E90BD58B28BDA9A78DC }}
+          
+      - name: Deploy to Azure Web App
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: 'catch-the-ai'
+          slot-name: 'Production'
+          package: .        
           
