@@ -11,6 +11,7 @@ namespace AiCatchGame.Web.HostedServices
     {
         private readonly IHostApplicationLifetime _hostApplicationLifetime;
         private readonly IServer _server;
+        private List<AiPlayerClientService> _aiPlayerClients = [];
         private HubConnection? _gameHubConnection;
         private IServiceScopeFactory _serviceScopeFactory;
         private Timer? _timer = null;
@@ -127,6 +128,7 @@ namespace AiCatchGame.Web.HostedServices
             foreach (GameServer game in games)
             {
                 await _gameHubConnection.SendAsync("GameStart", game.Id);
+                _aiPlayerClients.AddRange(gameService.InitializeAiPlayers(game));
             }
         }
     }

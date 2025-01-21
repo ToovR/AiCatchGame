@@ -3,10 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.12.35323.107
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiCatchGame.Web", "AiCatchGame.Web\AiCatchGame.Web\AiCatchGame.Web.csproj", "{3574CD27-E433-435A-9876-681A02393358}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiCatchGame.Web.Client", "AiCatchGame.Web\AiCatchGame.Web.Client\AiCatchGame.Web.Client.csproj", "{989305C9-0619-446F-8D48-B4E3C5672ABD}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiCatchGame.Bo", "AiCatchGame.Bo\AiCatchGame.Bo.csproj", "{B1F25069-9413-4868-95FB-5ADB28F9F945}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6D06A867-C195-4741-B3E3-364E8D95F3AF}"
@@ -15,24 +11,34 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiCatchGame.Web.Shared", "AiCatchGame.Web.Shared\AiCatchGame.Web.Shared.csproj", "{A10C283D-0BB9-4630-BD1C-6469D6FDFD02}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiCatchGame.Web.Client", "AiCatchGame.Web.Client\AiCatchGame.Web.Client.csproj", "{593BDBD8-E073-4047-8B16-8EF6008C065C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiCatchGame.Web", "AiCatchGame.Web\AiCatchGame.Web.csproj", "{7009808B-A321-46B4-BF9D-7B9AD62A2FD4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{3574CD27-E433-435A-9876-681A02393358}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3574CD27-E433-435A-9876-681A02393358}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3574CD27-E433-435A-9876-681A02393358}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3574CD27-E433-435A-9876-681A02393358}.Release|Any CPU.Build.0 = Release|Any CPU
-		{989305C9-0619-446F-8D48-B4E3C5672ABD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{989305C9-0619-446F-8D48-B4E3C5672ABD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{989305C9-0619-446F-8D48-B4E3C5672ABD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{989305C9-0619-446F-8D48-B4E3C5672ABD}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B1F25069-9413-4868-95FB-5ADB28F9F945}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B1F25069-9413-4868-95FB-5ADB28F9F945}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B1F25069-9413-4868-95FB-5ADB28F9F945}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B1F25069-9413-4868-95FB-5ADB28F9F945}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A10C283D-0BB9-4630-BD1C-6469D6FDFD02}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A10C283D-0BB9-4630-BD1C-6469D6FDFD02}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A10C283D-0BB9-4630-BD1C-6469D6FDFD02}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A10C283D-0BB9-4630-BD1C-6469D6FDFD02}.Release|Any CPU.Build.0 = Release|Any CPU
+		{593BDBD8-E073-4047-8B16-8EF6008C065C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{593BDBD8-E073-4047-8B16-8EF6008C065C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{593BDBD8-E073-4047-8B16-8EF6008C065C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{593BDBD8-E073-4047-8B16-8EF6008C065C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7009808B-A321-46B4-BF9D-7B9AD62A2FD4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7009808B-A321-46B4-BF9D-7B9AD62A2FD4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7009808B-A321-46B4-BF9D-7B9AD62A2FD4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7009808B-A321-46B4-BF9D-7B9AD62A2FD4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

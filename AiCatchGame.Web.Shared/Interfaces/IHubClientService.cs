@@ -1,16 +1,18 @@
 ﻿using AiCatchGame.Bo;
 
-namespace AiCatchGame.Web.Client.Interfaces
+namespace AiCatchGame.Web.Shared.Interfaces
 {
     public interface IHubClientService
     {
+        void Initialize(string url);
+
         Task OnGameJoined(Func<string, Guid, Task> handler);
 
         Task OnGameStart(Func<GameClient, Task> gameAction);
 
         Task OnNewPlayer(Func<string, Task> onNewPlayer);
 
-        Task OnReceivedMessage(Func<Guid, string, Task> receivedMessageAction);
+        Task OnReceivedMessage(Func<ChatMessage, Task> receivedMessageAction);
 
         Task OnSetShowScore(Func<GameSetResultInfo, Task> setShowScoreAction);
 

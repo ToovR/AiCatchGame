@@ -1,17 +1,22 @@
 using AiCatchGame.Bo;
 using AiCatchGame.Web.Interfaces;
+using AiCatchGame.Web.Shared.Interfaces;
 
 namespace AiCatchGame.Web.Services
 {
-    public class AiPlayerService
+    public class AiPlayerService : IAiPlayerService
     {
+        private readonly IGameService _gameService;
+        private readonly Dictionary<Guid, GameSetClient> _gameSets = [];
+        private readonly IHubClientService _hubClientService;
+        private readonly IServiceScopeFactory _serviceScopeFactory;
         private List<AiPlayer> _aiPlayers = [];
         private IChatService _chatService;
-
         private DateTime _lastMessageTime;
         private List<ChatMessage> _messages = [];
         private Queue<AiChatMessage> _messagesToSend = [];
         private Queue<string> _responses = [];
+        private Dictionary<Guid, AiPlayerClientService> clientServices = [];
 
         private string defaultSystemMessage =
         """
@@ -28,9 +33,10 @@ Pour certaines informations pas évidentes pour un humain à donner comme ca, tu
 dans chacune de tes réponses, inclut tout au debut une indication sur le temps qu'un humain mettrait à écrire la réponse sous la forme [TEMPS:XXs]
 """;
 
-        public AiPlayerService(IChatService chatService)
+        public AiPlayerService(IChatService chatService, IServiceScopeFactory serviceScopeFactory)
         {
             _chatService = chatService;
+            _serviceScopeFactory = serviceScopeFactory;
         }
 
         public async Task ManageResponse()
@@ -64,7 +70,7 @@ dans chacune de tes réponses, inclut tout au debut une indication sur le temps 
 
         public async Task OnPlayerSpeak(ChatMessage message)
         {
-            _lastMessageTime = message.Time!.Value;
+            _lastMessageTime = message.Time;
             _messages.Add(message);
             // TODO Add to AI LLM received message and get response
             foreach (AiPlayer player in _aiPlayers)
@@ -85,7 +91,8 @@ dans chacune de tes réponses, inclut tout au debut une indication sur le temps 
 
         private Task<string> TreatInAi(AiPlayer player, ChatMessage message)
         {
-            throw new NotImplementedException();
+            string response = new Random().Next(0, 2) == 0 ? "Message Test" : "[Ne répond pas]";
+            return Task.FromResult(response);
         }
 
         private string? TreatResponse(AiChatMessage message)

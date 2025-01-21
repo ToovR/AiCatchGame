@@ -1,17 +1,20 @@
 ﻿using AiCatchGame.Bo;
-using AiCatchGame.Web.Client.Interfaces;
-using Microsoft.AspNetCore.Components;
+using AiCatchGame.Web.Shared.Interfaces;
 using Microsoft.AspNetCore.SignalR.Client;
 
-namespace AiCatchGame.Web.Client.Services
+namespace AiCatchGame.Web.Shared.Services
 {
     public class HubClientService : IHubClientService
     {
         private HubConnection? _gameHubConnection = null;
 
-        public HubClientService(NavigationManager navigation)
+        public HubClientService()
         {
-            _gameHubConnection = new HubConnectionBuilder().WithUrl(navigation.ToAbsoluteUri("/gameHub")).Build();
+        }
+
+        public void Initialize(string url)
+        {
+            _gameHubConnection = new HubConnectionBuilder().WithUrl(url).Build();
         }
 
         public Task OnGameJoined(Func<string, Guid, Task> handler)
@@ -35,7 +38,7 @@ namespace AiCatchGame.Web.Client.Services
             return Task.CompletedTask;
         }
 
-        public Task OnReceivedMessage(Func<Guid, string, Task> receivedMessageAction)
+        public Task OnReceivedMessage(Func<ChatMessage, Task> receivedMessageAction)
         {
             ArgumentNullException.ThrowIfNull(_gameHubConnection);
 

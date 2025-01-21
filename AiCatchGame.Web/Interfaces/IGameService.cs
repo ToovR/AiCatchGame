@@ -1,4 +1,5 @@
 ﻿using AiCatchGame.Bo;
+using AiCatchGame.Web.Services;
 
 namespace AiCatchGame.Web.Interfaces
 {
@@ -24,8 +25,10 @@ namespace AiCatchGame.Web.Interfaces
 
         Task<GameSetResultInfo> GetSetResultInfo(Guid gameId);
 
+        IEnumerable<AiPlayerClientService> InitializeAiPlayers(GameServer game);
+
         Task<GameSetServer> InitializeSetInfo(Guid gameId);
 
-        Task StartGame(Guid id);
+        Task StartGame(Guid gameId);
     }
 }

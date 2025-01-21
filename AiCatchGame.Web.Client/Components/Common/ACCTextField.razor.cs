@@ -25,7 +25,7 @@ namespace AiCatchGame.Web.Client.Components.Common
                     return;
                 }
 
-                Task.Run(async() => await SetValueAsync(value, true, false));
+                Task.Run(async () => await SetValueAsync(value, true, false));
             }
         }
 
@@ -50,13 +50,7 @@ namespace AiCatchGame.Web.Client.Components.Common
             }
 
             _value = value;
-
             await ValueChanged.InvokeAsync(Value);
-
-            //if (updateText)
-            //{
-            //    await UpdateTextPropertyAsync(false);
-            //}
         }
 
         private async void OnTextKeyDown(KeyboardEventArgs args)

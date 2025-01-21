@@ -1,13 +1,16 @@
 using AiCatchGame.Bo;
 using AiCatchGame.Bo.Exceptions;
 using AiCatchGame.Web.Interfaces;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 
 namespace AiCatchGame.Web.Services
 {
-    public class GameService : IGameService
+    public class GameService(IActionContextAccessor context, IServiceScopeFactory serviceScopeFactory) : IGameService
     {
         private const int LOBBY_PLAYER_WAIING_SECONDS = 5;
         private static readonly List<GameServer> _games = [];
+        private readonly IActionContextAccessor _context = context;
+        private readonly IServiceScopeFactory _serviceScopeFactory = serviceScopeFactory;
 
         public async Task<Tuple<Guid, GameServer>> AddPlayerToGame(string pseudonym, String privateId)
         {
@@ -107,6 +110,14 @@ namespace AiCatchGame.Web.Services
             return result;
         }
 
+        public IEnumerable<AiPlayerClientService> InitializeAiPlayers(GameServer game)
+        {
+            foreach (AiPlayer aiPlayer in game.AiPlayers)
+            {
+                yield return InitializeAiPlayer(game, aiPlayer);
+            }
+        }
+
         public async Task<GameSetServer> InitializeSetInfo(Guid gameId)
         {
             GameServer game = await GetGameById(gameId);
@@ -171,6 +182,14 @@ namespace AiCatchGame.Web.Services
             };
             playerGameInfo.SetResults.Insert(game.GameSets.Count - 1, humanPlayerGameSetResultInfo);
             return humanPlayerGameSetResultInfo;
+        }
+
+        private AiPlayerClientService InitializeAiPlayer(GameServer game, AiPlayer aiPlayer)
+        {
+            string url = $"{this._context.ActionContext.HttpContext.Request.Scheme}://{this._context.ActionContext.HttpContext.Request.Host}:${this._context.ActionContext.HttpContext.Request.Protocol}/gameHub";
+            AiPlayerClientService newAIPlayerClientService = new AiPlayerClientService(aiPlayer, _serviceScopeFactory);
+            newAIPlayerClientService.InitializeClient(url, aiPlayer);
+            return newAIPlayerClientService;
         }
 
         private Task<GameServer> InitializeGame()

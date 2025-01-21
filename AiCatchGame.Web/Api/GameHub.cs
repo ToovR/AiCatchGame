@@ -6,11 +6,13 @@ namespace AiCatchGame.Web.Api
 {
     public class GameHub : Hub
     {
+        private readonly IAiPlayerService _aiPlayerService;
         private readonly IGameService _gameService;
 
-        public GameHub(IGameService gameService)
+        public GameHub(IGameService gameService, IAiPlayerService aiPlayerService)
         {
             _gameService = gameService;
+            _aiPlayerService = aiPlayerService;
         }
 
         public async Task GameStart(Guid gameId)
@@ -27,6 +29,7 @@ namespace AiCatchGame.Web.Api
         {
             string privateId = Context.ConnectionId;
             (Guid publicId, GameServer game) = await _gameService.AddPlayerToGame(pseudonym, privateId);
+
             await Clients.Caller.SendAsync("GameJoined", privateId, publicId);
             await GamePlayers(game).SendAsync("OnNewPlayer", pseudonym);
         }
@@ -36,7 +39,7 @@ namespace AiCatchGame.Web.Api
             await base.OnConnectedAsync();
         }
 
-        public Task OnReceivedMessage(Action<Guid, string> receivedMessageAction)
+        public Task OnReceivedMessage(Action<ChatMessage> receivedMessageAction)
         {
             throw new NotImplementedException();
         }
@@ -65,7 +68,9 @@ namespace AiCatchGame.Web.Api
                 return;
             }
 
-            await GamePlayers(game).SendAsync("ReceivedMessage", characterId, message);
+            ChatMessage chatMessage = new(characterId.Value, message, DateTime.Now);
+
+            await GamePlayers(game).SendAsync("ReceivedMessage", chatMessage);
         }
 
         public async Task SendPlayerReady(Guid player)
@@ -149,7 +154,7 @@ namespace AiCatchGame.Web.Api
                 {
                     continue;
                 }
-                GameSetClient gameSetClient = new(playerInfo, characterList, setinfo.RoundNumber, setinfo.Status, game.Rules.CharacterAttributionDuration);
+                GameSetClient gameSetClient = new(game.Id, playerInfo, characterList, setinfo.RoundNumber, setinfo.Status, game.Rules.CharacterAttributionDuration);
                 await Clients.Clients(playerInfo.PlayerPrivateId).SendAsync("SetStarted", gameSetClient);
             }
         }

@@ -54,14 +54,14 @@ namespace AiCatchGame.Web.Services
             game.GameSets.Add(newGameSet);
             List<Player> players = game.HumanPlayers.Cast<Player>().Concat(game.AiPlayers.Cast<Player>()).ToList();
 
-            List<string> remainingCharacterNames = ((string[])_poolCharacterNames.ToArray().Clone()).ToList();
+            List<string> characterNames = ((string[])_poolCharacterNames.ToArray().Clone()).ToList();
             players.ForEach(p =>
             {
                 p.GameStatus = GameStatuses.Playing;
-                int index = (new Random()).Next(remainingCharacterNames.Count);
+                int index = (new Random()).Next(characterNames.Count);
 
-                string characterName = remainingCharacterNames[index];
-                remainingCharacterNames.RemoveAt(index);
+                string characterName = characterNames[index];
+                characterNames.RemoveAt(index);
                 newGameSet.PlayerSetInfoList.Add(new PlayerSetInfo(p.PrivateId, characterName, Guid.NewGuid(), p is AiPlayer));
             });
 

@@ -13,10 +13,12 @@ builder.Services.AddRazorComponents()
 
 // https://www.c-sharpcorner.com/article/building-a-real-time-chat-application-with-net-core-7-signalr/
 
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddSignalR();
 builder.Services.AddMudServices();
 builder.Services.AddControllersWithViews();
 
+builder.Services.AddScoped<IAiPlayerService, AiPlayerService>();
 builder.Services.AddScoped<IGameService, GameService>();
 builder.Services.AddScoped<IChatService, ChatService>();
 builder.Services.AddHostedService<GameHostedService>();

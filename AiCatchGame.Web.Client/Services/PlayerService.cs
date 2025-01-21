@@ -1,6 +1,7 @@
 using AiCatchGame.Bo;
 using AiCatchGame.Bo.Exceptions;
 using AiCatchGame.Web.Client.Interfaces;
+using AiCatchGame.Web.Shared.Interfaces;
 
 namespace AiCatchGame.Web.Client.Services
 {
@@ -106,7 +107,7 @@ namespace AiCatchGame.Web.Client.Services
             await _hubClientService.OnNewPlayer(onNewPlayer);
         }
 
-        public async Task OnReceivedMessage(Func<Guid, string, Task> receivedMessageAction)
+        public async Task OnReceivedMessage(Func<ChatMessage, Task> receivedMessageAction)
         {
             ArgumentNullException.ThrowIfNull(_hubClientService);
             await _hubClientService.OnReceivedMessage(receivedMessageAction);

@@ -1,5 +1,6 @@
 using AiCatchGame.Bo.Exceptions;
 using AiCatchGame.Web.Client.Interfaces;
+using AiCatchGame.Web.Shared.Interfaces;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using MudBlazor;
@@ -14,6 +15,9 @@ namespace AiCatchGame.Web.Client.Components.Pages
         public IPlayerService? PlayerService { get; set; }
 
         [Inject]
+        private IHubClientService? HubClientService { get; set; }
+
+        [Inject]
         private IJSRuntime? JsRuntime { get; set; }
 
         [Inject]
@@ -23,7 +27,11 @@ namespace AiCatchGame.Web.Client.Components.Pages
         {
             ArgumentNullException.ThrowIfNull(JsRuntime);
             ArgumentNullException.ThrowIfNull(NavigationManager);
+            ArgumentNullException.ThrowIfNull(HubClientService);
             ArgumentNullException.ThrowIfNull(PlayerService);
+
+            Uri url = NavigationManager.ToAbsoluteUri("/gameHub");
+            HubClientService.Initialize(url.ToString());
 
             await JsRuntime.InvokeVoidAsync("autoplay");
 

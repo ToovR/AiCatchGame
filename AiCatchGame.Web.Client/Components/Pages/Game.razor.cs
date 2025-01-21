@@ -40,11 +40,11 @@ namespace AiCatchGame.Web.Client.Components.Pages
             await InitializeLobbyState();
         }
 
-        private Task AddMessage(Guid characterId, string message)
+        private Task AddMessage(ChatMessage message)
         {
             ArgumentNullException.ThrowIfNull(_characters);
             ArgumentNullException.ThrowIfNull(_messages);
-            string encodedMsg = $"{_characters[characterId]}: {message}";
+            string encodedMsg = $"{_characters[message.CharacterId]}: {message.Content}";
             _messages.Add(encodedMsg);
             this.StateHasChanged();
             return Task.CompletedTask;

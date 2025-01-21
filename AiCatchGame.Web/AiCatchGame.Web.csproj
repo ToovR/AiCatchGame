@@ -8,7 +8,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\AiCatchGame.Bo\AiCatchGame.Bo.csproj" />
     <ProjectReference Include="..\AiCatchGame.Web.Client\AiCatchGame.Web.Client.csproj" />
+    <ProjectReference Include="..\AiCatchGame.Web.Shared\AiCatchGame.Web.Shared.csproj" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="9.0.0" />
   </ItemGroup>
 
