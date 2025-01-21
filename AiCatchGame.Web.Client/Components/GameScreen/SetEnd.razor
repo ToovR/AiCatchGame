@@ -1,6 +1,6 @@
 ﻿@using AiCatchGame.Bo
 <div>
-    @if (SetResult != null)
+    @if (SetResult != null && _currentCharacter != null)
     {
         @foreach (AiGameSetResultInfo aiPlayer in SetResult.AiInfoList)
         {

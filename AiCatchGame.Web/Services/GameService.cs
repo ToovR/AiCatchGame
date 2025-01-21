@@ -9,7 +9,8 @@ namespace AiCatchGame.Web.Services
     {
         private const int LOBBY_PLAYER_WAIING_SECONDS = 5;
         private static readonly List<GameServer> _games = [];
-  //      private readonly IActionContextAccessor _context = context;
+
+        //      private readonly IActionContextAccessor _context = context;
         private readonly IServiceScopeFactory _serviceScopeFactory = serviceScopeFactory;
 
         public async Task<Tuple<Guid, GameServer>> AddPlayerToGame(string pseudonym, String privateId)
@@ -185,14 +186,13 @@ namespace AiCatchGame.Web.Services
             return humanPlayerGameSetResultInfo;
         }
 
-        private AiPlayerClientService InitializeAiPlayer(GameServer game, AiPlayer aiPlayer)
-        {
-            return null;
-            //string url = $"{this._context.ActionContext.HttpContext.Request.Scheme}://{this._context.ActionContext.HttpContext.Request.Host}:${this._context.ActionContext.HttpContext.Request.Protocol}/gameHub";
-            //AiPlayerClientService newAIPlayerClientService = new AiPlayerClientService(aiPlayer, _serviceScopeFactory);
-            //newAIPlayerClientService.InitializeClient(url, aiPlayer);
-            //return newAIPlayerClientService;
-        }
+        //private AiPlayerClientService InitializeAiPlayer(GameServer game, AiPlayer aiPlayer)
+        //{
+        //    string url = $"{this._context.ActionContext.HttpContext.Request.Scheme}://{this._context.ActionContext.HttpContext.Request.Host}:${this._context.ActionContext.HttpContext.Request.Protocol}/gameHub";
+        //    AiPlayerClientService newAIPlayerClientService = new AiPlayerClientService(aiPlayer, _serviceScopeFactory);
+        //    newAIPlayerClientService.InitializeClient(url, aiPlayer);
+        //    return newAIPlayerClientService;
+        //}
 
         private Task<GameServer> InitializeGame()
         {

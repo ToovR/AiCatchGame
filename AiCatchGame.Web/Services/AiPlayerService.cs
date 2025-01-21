@@ -1,15 +1,10 @@
 using AiCatchGame.Bo;
 using AiCatchGame.Web.Interfaces;
-using AiCatchGame.Web.Shared.Interfaces;
 
 namespace AiCatchGame.Web.Services
 {
     public class AiPlayerService : IAiPlayerService
     {
-        private readonly IGameService _gameService;
-        private readonly Dictionary<Guid, GameSetClient> _gameSets = [];
-        private readonly IHubClientService _hubClientService;
-        private readonly IServiceScopeFactory _serviceScopeFactory;
         private List<AiPlayer> _aiPlayers = [];
         private IChatService _chatService;
         private DateTime _lastMessageTime;
@@ -33,10 +28,9 @@ Pour certaines informations pas évidentes pour un humain à donner comme ca, tu
 dans chacune de tes réponses, inclut tout au debut une indication sur le temps qu'un humain mettrait à écrire la réponse sous la forme [TEMPS:XXs]
 """;
 
-        public AiPlayerService(IChatService chatService, IServiceScopeFactory serviceScopeFactory)
+        public AiPlayerService(IChatService chatService)
         {
             _chatService = chatService;
-            _serviceScopeFactory = serviceScopeFactory;
         }
 
         public async Task ManageResponse()
