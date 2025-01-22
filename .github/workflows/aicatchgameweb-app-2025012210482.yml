@@ -3,8 +3,6 @@ on:
   push:
     branches:
     - main
-
-
 env:
   CONTAINER_APP_CONTAINER_NAME: aicatchgameweb
   CONTAINER_APP_NAME: aicatchgameweb-app-2025012210482
