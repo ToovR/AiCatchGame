@@ -4,8 +4,7 @@ on:
     branches:
     - main
 
-permissions:
-  id-token: write
+
 env:
   CONTAINER_APP_CONTAINER_NAME: aicatchgameweb
   CONTAINER_APP_NAME: aicatchgameweb-app-2025012210482
@@ -13,6 +12,8 @@ env:
   CONTAINER_REGISTRY_LOGIN_SERVER: aicatchgamereg.azurecr.io
   DOCKER_FILE_PATH: AiCatchGame.Web/Dockerfile
   PROJECT_NAME_FOR_DOCKER: aicatchgameweb
+permissions:
+  id-token: write
 jobs:
   build:
     runs-on: ubuntu-latest
