@@ -13,7 +13,7 @@ namespace AiCatchGame.Bo
         public DateTime LastAddedPlayerTime { get; set; }
 
         public IEnumerable<string> PlayerPrivateIds
-        { get { return HumanPlayers.Select(p => p.PrivateId); } }
+        { get { return HumanPlayers.Select(p => p.PrivateId).Concat(AiPlayers.Select(ai => ai.PrivateId)); } }
 
         public GameRuleInfo Rules { get; }
         public GameStatuses Status { get; set; }

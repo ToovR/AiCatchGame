@@ -107,7 +107,7 @@ namespace AiCatchGame.Web.Client.Services
             await _hubClientService.OnNewPlayer(onNewPlayer);
         }
 
-        public async Task OnReceivedMessage(Func<ChatMessage, Task> receivedMessageAction)
+        public async Task OnReceivedMessage(Func<CTAChatMessage, Task> receivedMessageAction)
         {
             ArgumentNullException.ThrowIfNull(_hubClientService);
             await _hubClientService.OnReceivedMessage(receivedMessageAction);

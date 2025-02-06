@@ -1,4 +1,4 @@
-﻿namespace AiCatchGame.Web.Interfaces
+﻿namespace AiCatchGame.Api.Interfaces
 {
     public interface IChatService
     {

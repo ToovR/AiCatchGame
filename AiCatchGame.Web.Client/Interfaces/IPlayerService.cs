@@ -17,7 +17,7 @@ namespace AiCatchGame.Web.Client.Interfaces
 
         Task OnNewPlayer(Func<string, Task> onNewPlayer);
 
-        Task OnReceivedMessage(Func<ChatMessage, Task> receivedMessageAction);
+        Task OnReceivedMessage(Func<CTAChatMessage, Task> receivedMessageAction);
 
         Task OnSetSomeoneVoted(Func<SomeoneVotedInfo, Task> someoneVotedAction);
 

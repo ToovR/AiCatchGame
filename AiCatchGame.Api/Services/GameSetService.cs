@@ -1,22 +1,16 @@
+using AiCatchGame.Api.Interfaces;
 using AiCatchGame.Bo;
 using AiCatchGame.Web.Helpers;
-using AiCatchGame.Web.Interfaces;
 
-namespace AiCatchGame.Web.Services
+namespace AiCatchGame.Api.Services
 {
     public class GameSetService : IGameSetService
     {
         private readonly IGameService _game;
 
         private List<string> _poolCharacterNames = [ "Luke", "Leia", "Han", "Chewbacca", "Obi-Wan", "Anakin", "Padmé", "Yoda",
-            "Darth Vader", "R2-D2", "C-3PO", "Lando", "Boba Fett", "Jabba", "Wedge",
-            "Mace Windu", "Qui-Gon Jinn", "Darth Maul", "Jar Jar Binks", "Count Dooku",
-            "General Grievous", "Ahsoka Tano", "Rey", "Kylo Ren", "Finn", "Poe Dameron",
-            "BB-8", "Maz Kanata", "Snoke", "Rose Tico", "Jyn Erso", "Cassian Andor",
-            "K-2SO", "Chirrut Îmwe", "Baze Malbus", "Saw Gerrera", "Orson Krennic",
-            "Bodhi Rook", "Galen Erso", "Mon Mothma", "Bail Organa", "Jango Fett",
-            "Darth Sidious", "Darth Tyranus", "Darth Plagueis", "Darth Bane", "Darth Revan",
-            "Darth Malak", "Darth Nihilus", "Darth Sion", "Darth Traya", "Darth Malgus"];
+            "Darth Vader", "R2-D2", "C-3PO", "Lando", "Boba Fett", "Jabba", "Qui-Gon Jinn", "Darth Maul", "Jar Jar Binks", "Count Dooku",
+            "General Grievous", "Rey"];
 
         public GameSetService(IGameService game)
         {

@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiCatchGame.Web.Client", "A
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiCatchGame.Web", "AiCatchGame.Web\AiCatchGame.Web.csproj", "{7009808B-A321-46B4-BF9D-7B9AD62A2FD4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiCatchGame.Api", "AiCatchGame.Api\AiCatchGame.Api.csproj", "{2FC5B8A4-F46A-4971-9FB1-01321DA7D74D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{7009808B-A321-46B4-BF9D-7B9AD62A2FD4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7009808B-A321-46B4-BF9D-7B9AD62A2FD4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7009808B-A321-46B4-BF9D-7B9AD62A2FD4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2FC5B8A4-F46A-4971-9FB1-01321DA7D74D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2FC5B8A4-F46A-4971-9FB1-01321DA7D74D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2FC5B8A4-F46A-4971-9FB1-01321DA7D74D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2FC5B8A4-F46A-4971-9FB1-01321DA7D74D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

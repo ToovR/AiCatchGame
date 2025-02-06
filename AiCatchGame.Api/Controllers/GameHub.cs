@@ -1,8 +1,8 @@
+using AiCatchGame.Api.Interfaces;
 using AiCatchGame.Bo;
-using AiCatchGame.Web.Interfaces;
 using Microsoft.AspNetCore.SignalR;
 
-namespace AiCatchGame.Web.Api
+namespace AiCatchGame.Api.Controllers
 {
     public class GameHub : Hub
     {
@@ -17,6 +17,7 @@ namespace AiCatchGame.Web.Api
 
         public async Task GameStart(Guid gameId)
         {
+            await _aiPlayerService.InitializeAi();
             GameServer game = await _gameService.GetGameById(gameId);
             await _gameService.StartGame(game.Id);
             GameClient gameClient = new(GameStatuses.Playing);
@@ -39,7 +40,7 @@ namespace AiCatchGame.Web.Api
             await base.OnConnectedAsync();
         }
 
-        public Task OnReceivedMessage(Action<ChatMessage> receivedMessageAction)
+        public Task OnReceivedMessage(Action<CTAChatMessage> receivedMessageAction)
         {
             throw new NotImplementedException();
         }
@@ -68,7 +69,12 @@ namespace AiCatchGame.Web.Api
                 return;
             }
 
-            ChatMessage chatMessage = new(characterId.Value, message, DateTime.Now);
+            CTAChatMessage chatMessage = new(characterId.Value, message, DateTime.Now);
+
+            foreach (AiPlayer aiPlayer in game.AiPlayers)
+            {
+                await _aiPlayerService.OnPlayerSpeak(chatMessage, aiPlayer);
+            }
 
             await GamePlayers(game).SendAsync("ReceivedMessage", chatMessage);
         }
@@ -152,10 +158,14 @@ namespace AiCatchGame.Web.Api
             {
                 if (playerInfo.IsAi)
                 {
-                    continue;
+                    var aiPlayer = game.AiPlayers.Single(ap => ap.PrivateId == playerInfo.PlayerPrivateId);
+                    aiPlayer.Character = new CharacterInfo(playerInfo.CharacterId, playerInfo.CharacterName);
                 }
-                GameSetClient gameSetClient = new(game.Id, playerInfo, characterList, setinfo.RoundNumber, setinfo.Status, game.Rules.CharacterAttributionDuration);
-                await Clients.Clients(playerInfo.PlayerPrivateId).SendAsync("SetStarted", gameSetClient);
+                else
+                {
+                    GameSetClient gameSetClient = new(game.Id, playerInfo, characterList, setinfo.RoundNumber, setinfo.Status, game.Rules.CharacterAttributionDuration);
+                    await Clients.Clients(playerInfo.PlayerPrivateId).SendAsync("SetStarted", gameSetClient);
+                }
             }
         }
     }

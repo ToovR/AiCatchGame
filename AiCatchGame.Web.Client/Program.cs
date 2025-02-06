@@ -7,7 +7,13 @@ using MudBlazor.Services;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
-builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+string? apiUrl = builder.Configuration.GetValue<string>("ApiUrl");
+
+#if DEBUG
+builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:7262") });
+#else
+builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://aicatchgameapi.azurewebsites.net/") });
+#endif
 builder.Services.AddMudServices();
 
 builder.Services.AddSharedServices();

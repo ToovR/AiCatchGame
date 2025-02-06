@@ -1,6 +1,5 @@
-﻿using AiCatchGame.Bo;
-using AiCatchGame.Web.Interfaces;
-using AiCatchGame.Web.Services;
+﻿using AiCatchGame.Api.Interfaces;
+using AiCatchGame.Bo;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -11,8 +10,10 @@ namespace AiCatchGame.Web.HostedServices
     {
         private readonly IHostApplicationLifetime _hostApplicationLifetime;
         private readonly IServer _server;
-        private List<AiPlayerClientService> _aiPlayerClients = [];
+
+        //  private List<AiPlayerClientService> _aiPlayerClients = [];
         private HubConnection? _gameHubConnection;
+
         private IServiceScopeFactory _serviceScopeFactory;
         private Timer? _timer = null;
 
@@ -51,27 +52,42 @@ namespace AiCatchGame.Web.HostedServices
         {
             using IServiceScope scope = _serviceScopeFactory.CreateScope();
             IGameService gameService = scope.ServiceProvider.GetRequiredService<IGameService>();
+            IAiPlayerService aiPlayerService = scope.ServiceProvider.GetRequiredService<IAiPlayerService>();
             await TreatGamesInLobby(gameService);
             await TreatGameSetChatToStart(gameService);
             await TreatGameSetChatToStop(gameService);
             await TreatGameSetVoteToStop(gameService);
+            await TreatGameAiActions(gameService, aiPlayerService);
         }
 
         private string GetDefaultAddres()
         {
+#if DEBUG
             IServerAddressesFeature? serverAdressFeature = _server.Features.Get<IServerAddressesFeature>();
 
             ArgumentNullException.ThrowIfNull(serverAdressFeature);
             ICollection<string> addresses = serverAdressFeature.Addresses;
             return addresses.First();
+#else
+            return "http://localhost";
+#endif
         }
 
         private HubConnection InitializeGameHubConnection()
         {
             string baseUrl = GetDefaultAddres();
             HubConnection gameHubConnection = new HubConnectionBuilder()
-                  .WithUrl($"{baseUrl}/gameHub").Build();
+                 .WithUrl($"{baseUrl}/gameHub").Build();
             return gameHubConnection;
+        }
+
+        private async Task TreatGameAiActions(IGameService gameService, IAiPlayerService aiPlayerService)
+        {
+            IEnumerable<AiChatMessage> chatMessagess = aiPlayerService.ManageResponse();
+            foreach (AiChatMessage chatMessage in chatMessagess)
+            {
+                await _gameHubConnection.SendAsync("SendMessage", chatMessage.PlayerId, chatMessage.Content);
+            }
         }
 
         private async Task TreatGameSetChatToStart(IGameService gameService)
@@ -128,7 +144,7 @@ namespace AiCatchGame.Web.HostedServices
             foreach (GameServer game in games)
             {
                 await _gameHubConnection.SendAsync("GameStart", game.Id);
-                _aiPlayerClients.AddRange(gameService.InitializeAiPlayers(game));
+                // _aiPlayerClients.AddRange(gameService.InitializeAiPlayers(game));
             }
         }
     }

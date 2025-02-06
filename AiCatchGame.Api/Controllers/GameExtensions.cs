@@ -1,7 +1,7 @@
+using AiCatchGame.Api.Interfaces;
 using AiCatchGame.Bo;
-using AiCatchGame.Web.Interfaces;
 
-namespace AiCatchGame.Web.Api
+namespace AiCatchGame.Api.Controllers
 {
     public static class GameExtensions
     {

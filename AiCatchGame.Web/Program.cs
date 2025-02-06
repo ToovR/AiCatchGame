@@ -1,9 +1,4 @@
-using AiCatchGame.Web.Api;
 using AiCatchGame.Web.Components;
-using AiCatchGame.Web.HostedServices;
-using AiCatchGame.Web.Interfaces;
-using AiCatchGame.Web.Services;
-using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,22 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveWebAssemblyComponents();
 
-// https://www.c-sharpcorner.com/article/building-a-real-time-chat-application-with-net-core-7-signalr/
-
-builder.Services.AddHttpContextAccessor();
-builder.Services.AddSignalR();
-builder.Services.AddMudServices();
-builder.Services.AddControllersWithViews();
-
-builder.Services.AddScoped<IAiPlayerService, AiPlayerService>();
-builder.Services.AddScoped<IGameService, GameService>();
-builder.Services.AddScoped<IChatService, ChatService>();
-builder.Services.AddHostedService<GameHostedService>();
 var app = builder.Build();
-
-app.MapHub<GameHub>("/gameHub");
-
-app.MapGroup("api/Game").MapGame();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

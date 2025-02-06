@@ -1,9 +1,8 @@
+using AiCatchGame.Api.Interfaces;
 using AiCatchGame.Bo;
 using AiCatchGame.Bo.Exceptions;
-using AiCatchGame.Web.Interfaces;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
 
-namespace AiCatchGame.Web.Services
+namespace AiCatchGame.Api.Services
 {
     public class GameService(IServiceScopeFactory serviceScopeFactory) : IGameService
     {
@@ -111,14 +110,14 @@ namespace AiCatchGame.Web.Services
             return result;
         }
 
-        public IEnumerable<AiPlayerClientService> InitializeAiPlayers(GameServer game)
-        {
-            return [];
-            //foreach (AiPlayer aiPlayer in game.AiPlayers)
-            //{
-            //    yield return InitializeAiPlayer(game, aiPlayer);
-            //}
-        }
+        //public IEnumerable<AiPlayerClientService> InitializeAiPlayers(GameServer game)
+        //{
+        //    //return [];
+        //    foreach (AiPlayer aiPlayer in game.AiPlayers)
+        //    {
+        //        yield return InitializeAiPlayer(game, aiPlayer);
+        //    }
+        //}
 
         public async Task<GameSetServer> InitializeSetInfo(Guid gameId)
         {
@@ -188,7 +187,7 @@ namespace AiCatchGame.Web.Services
 
         //private AiPlayerClientService InitializeAiPlayer(GameServer game, AiPlayer aiPlayer)
         //{
-        //    string url = $"{this._context.ActionContext.HttpContext.Request.Scheme}://{this._context.ActionContext.HttpContext.Request.Host}:${this._context.ActionContext.HttpContext.Request.Protocol}/gameHub";
+        //    string url = $" https://localhost:7262/gameHub";
         //    AiPlayerClientService newAIPlayerClientService = new AiPlayerClientService(aiPlayer, _serviceScopeFactory);
         //    newAIPlayerClientService.InitializeClient(url, aiPlayer);
         //    return newAIPlayerClientService;
@@ -197,7 +196,7 @@ namespace AiCatchGame.Web.Services
         private Task<GameServer> InitializeGame()
         {
             GameServer newGame = new(GameRuleInfo.GetDefault());
-            AiPlayer aiPlayer = new("Ai1");
+            AiPlayer aiPlayer = new(Guid.NewGuid().ToString());
             newGame.AiPlayers = [aiPlayer];
             return Task.FromResult(newGame);
         }

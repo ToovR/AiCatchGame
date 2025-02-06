@@ -1,14 +1,13 @@
 using AiCatchGame.Bo;
-using AiCatchGame.Web.Interfaces;
+using AiCatchGame.Api.Interfaces;
 using Microsoft.AspNetCore.SignalR.Client;
 
-namespace AiCatchGame.Web.Services
+namespace AiCatchGame.Api.Services
 {
     public class ChatService : IChatService
     {
         public async Task PostMessage(string playerId, string message)
         {
-
             var connection = new HubConnectionBuilder()
                 .WithUrl("/GameHub")
                 .Build();

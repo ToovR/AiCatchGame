@@ -38,7 +38,7 @@ namespace AiCatchGame.Web.Shared.Services
             return Task.CompletedTask;
         }
 
-        public Task OnReceivedMessage(Func<ChatMessage, Task> receivedMessageAction)
+        public Task OnReceivedMessage(Func<CTAChatMessage, Task> receivedMessageAction)
         {
             ArgumentNullException.ThrowIfNull(_gameHubConnection);
 

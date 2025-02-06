@@ -12,7 +12,7 @@ namespace AiCatchGame.Web.Shared.Interfaces
 
         Task OnNewPlayer(Func<string, Task> onNewPlayer);
 
-        Task OnReceivedMessage(Func<ChatMessage, Task> receivedMessageAction);
+        Task OnReceivedMessage(Func<CTAChatMessage, Task> receivedMessageAction);
 
         Task OnSetShowScore(Func<GameSetResultInfo, Task> setShowScoreAction);
 

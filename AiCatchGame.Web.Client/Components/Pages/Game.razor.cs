@@ -40,7 +40,7 @@ namespace AiCatchGame.Web.Client.Components.Pages
             await InitializeLobbyState();
         }
 
-        private Task AddMessage(ChatMessage message)
+        private Task AddMessage(CTAChatMessage message)
         {
             ArgumentNullException.ThrowIfNull(_characters);
             ArgumentNullException.ThrowIfNull(_messages);

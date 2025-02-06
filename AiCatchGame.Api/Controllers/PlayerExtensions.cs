@@ -1,7 +1,4 @@
-using AiCatchGame.Web.Interfaces;
-using Microsoft.AspNetCore.Mvc;
-
-namespace AiCatchGame.Web.Api
+namespace AiCatchGame.Api.Controllers
 {
     public static class PlayerExtensions
     {
